@@ -52,7 +52,7 @@ system_size_f = used_area / 15            #capacity in kW
 
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 50)
 num_trackers_rec = max(1, round(system_size_f / tracker_kw))
-st.sidebar.write("Recommended: ",round(num_trackers_rec))
+#st.sidebar.write("Recommended: ",round(num_trackers_rec))
 system_size_t = num_trackers * tracker_kw
 system_size = system_size_f
  
@@ -243,7 +243,7 @@ if uploaded_file is not None:
         fig.add_vline(
             x = break_even_f,
             line_dash = "dash",
-            line_color = "green",
+            line_color = "blue",
             line_width = 1,
         )
         fig.add_annotation(
@@ -258,7 +258,7 @@ if uploaded_file is not None:
         fig.add_vline(
             x = break_even_t,
             line_dash = "dash",
-            line_color = "green",
+            line_color = "red",
             line_width = 1
         )
         fig.add_annotation(
