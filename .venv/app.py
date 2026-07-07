@@ -243,7 +243,7 @@ if uploaded_file is not None:
         fig.add_vline(
             x = break_even_f,
             line_dash = "dash",
-            line_color = "blue",
+            line_color = "light blue",
             line_width = 1,
         )
         fig.add_annotation(
@@ -251,7 +251,7 @@ if uploaded_file is not None:
             y = max(baseline_trend) * 0.85,
             text = f"Fixed Break-Even Year: {break_even_f}",
             showarrow = False,
-            font = dict(color = "green", size = 11)
+            font = dict(color = "black", size = 11)
         )
 
     if break_even_t is not None:
@@ -266,7 +266,7 @@ if uploaded_file is not None:
             y = max(baseline_trend),
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
-            font = dict(color = "green", size = 11)
+            font = dict(color = "black", size = 11)
         )
     
     fig.update_layout(
