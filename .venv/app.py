@@ -9,9 +9,8 @@ st.subheader("Cumulative 20-year spending comparison for current system vs fixed
 tracker_kw = 42.84
 itc_rate = 0.30
 degrad = 0.005
-om_per_kw = 20.0     #old 0.20
+om_per_kw = 20.0     
 om_esc = 0.04
-#eff_rate = 0.2284
 total_yrs = 20
 years = list(range(1,total_yrs + 1))
 macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
@@ -48,46 +47,28 @@ elec_increase = float(elec_increase_input) / 100
 fed_tax_input = st.sidebar.slider("Federal tax rate:", 0,40,21) 
 fed_tax = float(fed_tax_input) / 100                                                             
 
-num_trackers = st.sidebar.slider("Number of trackers:", 1, 20)
-
 used_area = roof_size * roof_dec
-system_size_f = used_area / 15            #kW
+system_size_f = used_area / 15            #capacity in kW
+
+num_trackers = st.sidebar.slider("Number of trackers:", 1, 50)
+num_trackers_rec = max(1, round(system_size_f / tracker_kw))
+st.sidebar.write("Recommended: ",round(num_trackers_rec))
 system_size_t = num_trackers * tracker_kw
-#avg_annual_gen = system_size * 1400     #kWh
 system_size = system_size_f
-#calc roof usage
-#fixed_max_kw = round(roof_size / 100, 2)
-#tracker_max_kw = round(roof_size / 150, 2)
-tracker_max_kw = num_trackers * tracker_kw
-fixed_max_kw = tracker_max_kw
-
-tracker_panel_cap = (tracker_max_kw * 1000 * base_panel)
-machinery_cap = (num_trackers * machinery_cost)
-#tracker_cap = tracker_panel_cap + machinery_cap + com_costs
-
+ 
 #gross cost baseline
 fixed_gross_per_w = 1.54
-tracker_gross_per_w = 1.95
+tracker_gross_per_w = 2.50
 
 #upfront costs
-#fixed_cap = system_size * 1000 * 3.50
-#tracker_cap = tracker_max_kw * 1000 * 3.90
-
 fixed_cap = (system_size_f * 1000 * base_panel) + com_costs
 tracker_cap = (system_size_t * 1000 * base_panel) + (num_trackers * machinery_cost) + com_costs
 
 fixed_itc_value = fixed_cap * itc_rate
 tracker_itc_value = tracker_cap * itc_rate
 
-#tax applied
-#fixed_net_inv = fixed_cap * (1 - fed_tax)
-#tracker_net_inv = tracker_cap * (1 - fed_tax)
-
 fixed_net_inv = fixed_cap - fixed_itc_value
 tracker_net_inv = tracker_cap - tracker_itc_value
-
-fixed_basis = fixed_cap - (fixed_itc_value * 0.5)
-tracker_basis = tracker_cap - (tracker_itc_value * 0.5)
 
 uploaded_file = st.file_uploader("Please upload a CSV file of your Green Button Data:", type=["csv"])
 
@@ -136,39 +117,37 @@ if uploaded_file is not None:
 
     target_cap_kw = num_trackers * tracker_kw
 
+    fixed_raw_gen = system_size_f * fixed_sp_yield
+    tracker_raw_gen = system_size_t * tracker_sp_yield
+
+    fixed_usable_per = 0.85 if fixed_raw_gen > total_baseline_kwh else 1.0
+    tracker_usable_per = 0.70 if tracker_raw_gen > total_baseline_kwh else 1.0
+
     #fixed calculations
     fixed_yearly = target_cap_kw * 1350
-    fixed_gross = target_cap_kw * 1000 * 2.90
-    fixed_net = fixed_gross * (1 - fed_tax)
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
 
     #tracker calculations
     tracker_yearly = target_cap_kw * (1350 * 1.25)
-    tracker_gross = target_cap_kw * (1000 + 3.77)
-    tracker_net = tracker_gross * (1 - fed_tax)
     tracker_itc = tracker_cap * itc_rate
     tracker_basis = tracker_cap - (tracker_itc * 0.5)
     tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
 
-    npv_fixed = -fixed_cap
-    npv_tracker = -tracker_cap
-
-    fixed_gen = min(fixed_yearly, total_baseline_kwh)
-    tracker_gen = min(tracker_yearly, total_baseline_kwh)
+    #fixed_gen = min(fixed_yearly, total_baseline_kwh)
+    #tracker_gen = min(tracker_yearly, total_baseline_kwh)
 
     ann_baseline_spending = total_baseline_kwh * elec_current
 
     cash_flow_base = 0.0
-    #cf_fixed = fixed_cap * (1 - fed_tax)
-    #cf_tracker = tracker_cap * (1 - fed_tax)
 
     fixed_ann_savings = []
     tracker_ann_savings = []
 
     for i in range(total_yrs):
-        
+        yr_num = i + 1
+
         #rising rates
         utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
@@ -182,15 +161,13 @@ if uploaded_file is not None:
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
         t_macrs_cred = tracker_mac[i] if i < len(fixed_mac) else 0
 
-        #f_itc_credit = fixed_itc if i == 0 else 0
-        #t_itc_credit = tracker_itc if i == 0 else 0
-
         #fixed
-        fixed_gen = fixed_max_kw * fixed_sp_yield * panel_eff
-        fixed_offset = min(fixed_gen * elec_current * utility_escalation_factor, current_spending)
+        fixed_gen = system_size_f * fixed_sp_yield * panel_eff
+        fixed_gen_usable = min(fixed_gen * fixed_usable_per, total_baseline_kwh)
+        fixed_offset = fixed_gen_usable * elec_current * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
-        fixed_savings = min(fixed_gen * elec_current * utility_escalation_factor, current_spending) 
-        fixed_om = (fixed_max_kw * om_per_kw) * om_escalation_factor
+        #fixed_savings = min(fixed_gen * elec_current * utility_escalation_factor, current_spending) 
+        fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred 
         
         #net fixed
@@ -198,11 +175,12 @@ if uploaded_file is not None:
         fixed_trend.append(cf_fixed)
         
         #tracker
-        tracker_gen = tracker_max_kw * tracker_sp_yield * panel_eff
-        tracker_offset = min(tracker_gen * elec_current * utility_escalation_factor, current_spending)
+        tracker_gen = system_size_t * tracker_sp_yield * panel_eff
+        tracker_gen_usable = min(tracker_gen * tracker_usable_per, total_baseline_kwh)
+        tracker_offset = tracker_gen_usable * elec_current * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
-        tracker_savings = min(tracker_gen * elec_current * utility_escalation_factor, current_spending) 
-        tracker_om = (tracker_max_kw * om_per_kw * 1.25) * om_escalation_factor 
+        #tracker_savings = min(tracker_gen * elec_current * utility_escalation_factor, current_spending) 
+        tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
         #net tracker
         tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred
@@ -210,7 +188,7 @@ if uploaded_file is not None:
         tracker_trend.append(cf_tracker)
 
         fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
-        tracker_ann_savings.append(tracker_offset - tracker_om + f_macrs_cred)
+        tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
         disc_factor = (1 + disc_rate) ** i
 
@@ -269,8 +247,8 @@ if uploaded_file is not None:
             line_width = 1,
         )
         fig.add_annotation(
-            x = break_even_f+2.7,
-            y = max(baseline_trend) * 0.75,
+            x = break_even_f,
+            y = max(baseline_trend) * 0.85,
             text = f"Fixed Break-Even Year: {break_even_f}",
             showarrow = False,
             font = dict(color = "green", size = 11)
@@ -284,8 +262,8 @@ if uploaded_file is not None:
             line_width = 1
         )
         fig.add_annotation(
-            x = break_even_t+2.7,
-            y = max(baseline_trend) * 0.85,
+            x = break_even_t,
+            y = max(baseline_trend),
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
             font = dict(color = "green", size = 11)
@@ -300,10 +278,21 @@ if uploaded_file is not None:
     st.plotly_chart(fig, use_container_width = True)
 
     #savings chart
+
+
+    #w initial investment
+    #years_w_zero = [0] + years
+    #f_savings_w_zero = [-fixed_net_inv] + fixed_ann_savings
+    #t_savings_w_zero = [-tracker_net_inv] + tracker_ann_savings
+
     savings_data = pd.DataFrame({
+        #higher w tax benefits, finance over time
         "Year": years,
         "Fixed Solar Savings": fixed_ann_savings,
         "Tracker Solar Savings": tracker_ann_savings
+        #"Year": years_w_zero,
+        #"Fixed Solar Savings": f_savings_w_zero,
+        #"Tracker Solar Savings": t_savings_w_zero
     })
 
     fig_bar = px.bar(
