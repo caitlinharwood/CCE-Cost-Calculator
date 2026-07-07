@@ -243,7 +243,7 @@ if uploaded_file is not None:
         fig.add_vline(
             x = break_even_f,
             line_dash = "dash",
-            line_color = "light blue",
+            line_color = "lightskyblue",
             line_width = 1,
         )
         fig.add_annotation(
