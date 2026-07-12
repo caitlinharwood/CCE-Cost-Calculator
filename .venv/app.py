@@ -105,6 +105,7 @@ if uploaded_file is not None:
 
     #set baseline
     cash_flow_base = 0.0
+    cash_flow_base_pv = 0.0
     cf_fixed = fixed_net_inv
     cf_tracker = tracker_net_inv
 
