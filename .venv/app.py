@@ -18,6 +18,7 @@ macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
 base_panel = 1.10
 machinery_cost = 6500.00
 com_costs = 1507
+excess_credit_rate = 0.85
 
 #get user inputs
 st.sidebar.subheader("Inputs:")
@@ -122,8 +123,6 @@ if uploaded_file is not None:
         usage = raw_usage.head(8760)
         total_baseline_kwh = usage.sum()
 
-    #net_cost = (system_size * 2800) * (1 - fed_tax)
-
     target_cap_kw = num_trackers * tracker_kw
 
     fixed_raw_gen = system_size_f * fixed_sp_yield
@@ -143,9 +142,6 @@ if uploaded_file is not None:
     tracker_itc = tracker_cap * itc_rate
     tracker_basis = tracker_cap - (tracker_itc * 0.5)
     tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
-
-    #fixed_gen = min(fixed_yearly, total_baseline_kwh)
-    #tracker_gen = min(tracker_yearly, total_baseline_kwh)
 
     ann_baseline_spending = total_baseline_kwh * elec_current
 
@@ -180,7 +176,7 @@ if uploaded_file is not None:
             fixed_gen_usable = fixed_gen
         else:
             excess_f = fixed_gen - total_baseline_kwh
-            fixed_gen_usable = total_baseline_kwh + excess_f * 0.85
+            fixed_gen_usable = total_baseline_kwh + excess_f * excess_credit_rate
 
         fixed_offset = fixed_gen_usable * elec_current * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
@@ -200,7 +196,7 @@ if uploaded_file is not None:
             tracker_gen_usable = tracker_gen
         else:
             excess_t = tracker_gen - total_baseline_kwh
-            tracker_gen_usable = total_baseline_kwh + excess_t * 0.70
+            tracker_gen_usable = total_baseline_kwh + excess_t * excess_credit_rate
         tracker_offset = tracker_gen_usable * elec_current * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
@@ -316,21 +312,11 @@ if uploaded_file is not None:
     st.plotly_chart(fig, use_container_width = True)
 
     #savings chart
-
-
-    #w initial investment
-    #years_w_zero = [0] + years
-    #f_savings_w_zero = [-fixed_net_inv] + fixed_ann_savings
-    #t_savings_w_zero = [-tracker_net_inv] + tracker_ann_savings
-
     savings_data = pd.DataFrame({
         #higher w tax benefits, finance over time
         "Year": years,
         "Fixed Solar Savings": fixed_ann_savings,
         "Tracker Solar Savings": tracker_ann_savings
-        #"Year": years_w_zero,
-        #"Fixed Solar Savings": f_savings_w_zero,
-        #"Tracker Solar Savings": t_savings_w_zero
     })
 
     fig_bar = px.bar(
