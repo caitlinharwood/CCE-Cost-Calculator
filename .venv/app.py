@@ -5,6 +5,7 @@ import numpy as np
 
 st.title("CCE Cost Calculator")
 st.subheader("Cumulative 20-year spending comparison for current system vs fixed solar vs solar tracking options")
+
 #constants
 tracker_kw = 42.84
 itc_rate = 0.30
@@ -20,7 +21,7 @@ com_costs = 1507
 
 #get user inputs
 st.sidebar.subheader("Inputs:")
-roof_size=st.sidebar.number_input("Area of roof (sq ft): ", min_value = 0.0, value = 3000.0, step = 5.0)
+roof_size=st.sidebar.number_input("Area of roof (sq ft): ")
 roof_percent=st.sidebar.slider("Percentage of roof covered: ", 10,100)
 roof_dec = float(roof_percent) / 100
 disc_rate=st.sidebar.slider("Discount rate (%):",min_value=0.0, max_value=15.0, value=7.0, step=0.5) / 100
@@ -44,15 +45,17 @@ elec_current = rate_mapping[sdge_rate]
 elec_increase_input = st.sidebar.slider("Rate increase per year (%):",0,15,5)                                   
 elec_increase = float(elec_increase_input) / 100
 
-fed_tax_input = st.sidebar.slider("Federal tax rate:", 0,40,21) 
+fed_tax_input = st.sidebar.slider("Federal tax rate:", 0,40,30) 
 fed_tax = float(fed_tax_input) / 100                                                             
 
 used_area = roof_size * roof_dec
 system_size_f = used_area / 15            #capacity in kW
 
-num_trackers = st.sidebar.slider("Number of trackers:", 1, 50)
-num_trackers_rec = max(1, round(system_size_f / tracker_kw))
-#st.sidebar.write("Recommended: ",round(num_trackers_rec))
+if roof_size:
+    num_trackers_rec = max(1, round(system_size_f / tracker_kw))
+else:
+    num_trackers_rec = 10
+num_trackers = st.sidebar.slider("Number of trackers:", 1, 50, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
 system_size = system_size_f
  
@@ -96,6 +99,9 @@ if uploaded_file is not None:
     baseline_trend = []
     fixed_trend = []
     tracker_trend = []
+    baseline_trend_pv = []
+    fixed_trend_pv = []
+    tracker_trend_pv = []
 
     #set baseline
     cash_flow_base = 0.0
@@ -113,7 +119,7 @@ if uploaded_file is not None:
         usage = raw_usage.head(8760)
         total_baseline_kwh = usage.sum()
 
-    net_cost = (system_size * 2800) * (1 - fed_tax)
+    #net_cost = (system_size * 2800) * (1 - fed_tax)
 
     target_cap_kw = num_trackers * tracker_kw
 
@@ -152,40 +158,56 @@ if uploaded_file is not None:
         utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         panel_eff = (1 - degrad) ** i
+        disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
 
         #current baseline
         current_spending = total_baseline_kwh * elec_current * utility_escalation_factor
         cash_flow_base += current_spending
+        cash_flow_base_pv += current_spending * disc_factor 
         baseline_trend.append(cash_flow_base)
+        baseline_trend_pv.append(cash_flow_base_pv)
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
-        t_macrs_cred = tracker_mac[i] if i < len(fixed_mac) else 0
+        t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
 
         #fixed
         fixed_gen = system_size_f * fixed_sp_yield * panel_eff
-        fixed_gen_usable = min(fixed_gen * fixed_usable_per, total_baseline_kwh)
+
+        if fixed_gen <= total_baseline_kwh:
+            fixed_gen_usable = fixed_gen
+        else:
+            excess_f = fixed_gen - total_baseline_kwh
+            fixed_gen_usable = total_baseline_kwh + excess_f * 0.85
+
         fixed_offset = fixed_gen_usable * elec_current * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
-        #fixed_savings = min(fixed_gen * elec_current * utility_escalation_factor, current_spending) 
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred 
         
         #net fixed
         cf_fixed += fixed_out_of_pocket
         fixed_trend.append(cf_fixed)
+        cf_fixed_pv += fixed_out_of_pocket * disc_factor
+        fixed_trend_pv.append(cf_fixed_pv)
         
         #tracker
         tracker_gen = system_size_t * tracker_sp_yield * panel_eff
-        tracker_gen_usable = min(tracker_gen * tracker_usable_per, total_baseline_kwh)
+
+        if tracker_gen <= total_baseline_kwh:
+            tracker_gen_usable = tracker_gen
+        else:
+            excess_t = tracker_gen - total_baseline_kwh
+            tracker_gen_usable = total_baseline_kwh + excess_t * 0.70
         tracker_offset = tracker_gen_usable * elec_current * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
-        #tracker_savings = min(tracker_gen * elec_current * utility_escalation_factor, current_spending) 
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
         #net tracker
         tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
+        cf_tracker_pv += tracker_out_of_pocket * disc_factor
+        tracker_trend_pv.append(cf_tracker_pv)
 
         fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
         tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
@@ -195,12 +217,25 @@ if uploaded_file is not None:
 
     target_len = len(years)
 
+    use_pv = st.checkbox(
+        "Discount cash flows to present value",
+        value = True,
+    )
+
+    if use_pv:
+        chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
+        y_axis_title = "Present Value of Cumulative Spending ($)"
+        chart_title = "20-Year Cumulative Spending (Present Value)"
+    else:
+        chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_trend, tracker_trend
+        y_axis_title = "Cumulative Spending ($)"
+        chart_title = "20-Year Cumulative Spending"
     #line graphs
     chart_data = pd.DataFrame({
         "Year": years,
-        "Current": baseline_trend,
-        "Fixed": fixed_trend,
-        "Tracking": tracker_trend,
+        "Current": chart_baseline,
+        "Fixed": chart_fixed,
+        "Tracking": chart_tracker,
     })
 
     #break-even points
@@ -209,10 +244,10 @@ if uploaded_file is not None:
         fidx = yr -1
         if fidx == 0:
             continue
-        if baseline_trend[fidx] >= fixed_trend[fidx] and baseline_trend[fidx - 1] < fixed_trend[fidx - 1]:
+        if chart_baseline[fidx] >= chart_fixed[fidx] and chart_baseline[fidx - 1] < chart_fixed[fidx - 1]:
             fprev_yr = years[fidx - 1]
-            fprev_dif = fixed_trend[fidx - 1] - baseline_trend[fidx - 1]
-            fcurrent_dif = baseline_trend[fidx] - fixed_trend[fidx]
+            fprev_dif = chart_fixed[fidx - 1] - chart_baseline[fidx - 1]
+            fcurrent_dif = chart_baseline[fidx] - chart_fixed[fidx]
             fdif = fprev_dif / (fprev_dif + fcurrent_dif)
             break_even_f = round(fprev_yr + fdif, 2)
             break
@@ -222,10 +257,10 @@ if uploaded_file is not None:
         tidx = yr -1
         if tidx == 0:
             continue
-        if baseline_trend[tidx] >= tracker_trend[tidx] and baseline_trend[tidx - 1] < tracker_trend[tidx - 1]:
+        if chart_baseline[tidx] >= chart_tracker[tidx] and chart_baseline[tidx - 1] < chart_tracker[tidx - 1]:
             tprev_yr = years[tidx - 1]
-            tprev_dif = tracker_trend[tidx - 1] - baseline_trend[tidx - 1]
-            tcurrent_dif = baseline_trend[tidx] - tracker_trend[tidx]
+            tprev_dif = chart_tracker[tidx - 1] - chart_baseline[tidx - 1]
+            tcurrent_dif = chart_baseline[tidx] - chart_tracker[tidx]
             tdif = tprev_dif / (tprev_dif + tcurrent_dif)
             break_even_t = round(tprev_yr + tdif, 2)
             break
