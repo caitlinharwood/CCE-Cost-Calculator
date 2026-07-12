@@ -108,6 +108,8 @@ if uploaded_file is not None:
     cash_flow_base_pv = 0.0
     cf_fixed = fixed_net_inv
     cf_tracker = tracker_net_inv
+    cf_fixed_pv = fixed_net_inv
+    cf_tracker_pv = tracker_net_inv
 
     raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
 
