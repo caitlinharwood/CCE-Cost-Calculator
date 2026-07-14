@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import math
 
 st.title("CCE Cost Calculator")
 st.subheader("Cumulative 20-year spending comparison for current system vs fixed solar vs solar tracking options")
@@ -19,6 +20,17 @@ base_panel = 1.10
 machinery_cost = 6500.00
 com_costs = 1507
 excess_credit_rate = 0.85
+inverter_rate = 0.12
+kwh_kw_yr_tracker = 2360
+kwh_kw_yr_fixed = 1680
+elecbos_w = 0.18
+labor_rate = 85
+labor_hours = 1595.06
+acc_cost = 0.02
+strucural = 48115
+mod_per_tracker = 90
+complexity = 1.08
+
 
 #get user inputs
 st.sidebar.subheader("Inputs:")
@@ -28,18 +40,27 @@ roof_dec = float(roof_percent) / 100
 disc_rate=st.sidebar.slider("Discount rate (%):",min_value=0.0, max_value=15.0, value=7.0, step=0.5) / 100
 sdge_rate = st.sidebar.selectbox("Rate Plan",["SDG&E TOU-A", "SDG&E AL-TOU", "SDG&E AL-TOU-2", "SDG&E TOU-DR2", "SDG&E AL-TOU-L", "SDG&E DG-R-L", "SDG&E TOU-M", "SDG&E AL-TOU-M", "SDG&E DG-R-M", "SDG&E TOU-A2", "SDG&E TOU-A3"])
 rate_mapping = {
-    "SDG&E TOU-A": 0.3150,
-    "SDG&E AL-TOU": 0.1600,
-    "SDG&E AL-TOU-2": 0.1720,
-    "SDG&E TOU-DR2": 0.3650,
-    "SDG&E AL-TOU-L": 0.1550,
-    "SDG&E DG-R-L": 0.1850,
-    "SDG&E TOU-M": 0.2850,
-    "SDG&E AL-TOU-M": 0.1650,
-    "SDG&E DG-R-M": 0.2100,
-    "SDG&E TOU-A2": 0.3320,
-    "SDG&E TOU-A3": 0.2980
+    "SDG&E TOU-A": [0.57574,0.42312,0.43513,0.33589],   #summer_peak, summer_offpeak, winter_peak, winter_offpeak
+    "SDG&E AL-TOU": [0.242, 0.151, 0.132, 0.264, 0.154, 0.121], #sum_peak, sum_offpeak, sum_sop, winter_peak, winter_offpeak, winter_sop, off p  sop
+    "SDG&E AL-TOU-2": [0.2586, 0.16378, 0.14437, 0.28212, 0.16654, 0.13301],  #sum_peak, sum_offpeak, sum_sop, winter_peak, win_offpeak, win)sop
+    "SDG&E TOU-DR2": [0.68907, 0.41773, 0.61014, 0.47316], #sum_peak, sum_offpeak, winter_peak, winter_offpeak
+    "SDG&E AL-TOU-L": [0.28315,0.17847, 0.15744, 0.30956, 0.18192, 0.1449], #sum_peak, offpeak, sop, winter_peak, offpeak, sop
+    "SDG&E DG-R-L": [0.16417, 0.29004, 0.18206, 0.7732, 0.20089, 0.17241],
+    "SDG&E TOU-M": [0.6229,0.30936, 0.23389, 0.3332, 0.24944, 0.22592],
+    "SDG&E AL-TOU-M": [0.31908, 0.20971, 0.1879, 0.34686, 0.21349, 0.1748],
+    "SDG&E DG-R-M": [0.96824, 0.27714, 0.16457, 0.56019, 0.18424, 0.15449],
+    "SDG&E TOU-A2": [0.64136, 0.34408, 0.27545, 0.36934, 0.2903, 0.26697],
+    "SDG&E TOU-A3": [0.57911, 0.44639, 0.32795, 0.42062, 0.34158, 0.31825]
+
 }
+
+#summer: june 1 - oct 31
+#winter: nov 1 - may 31
+
+#peak: 4pm - 9pm
+#off-peak: 6am - 10am, 2pm - 4pm, 9pm - 12am
+#super off-peak: 12am - 6am, 10am - 2pm
+
 elec_current = rate_mapping[sdge_rate]
 
 #% increase per year
@@ -59,6 +80,15 @@ else:
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 50, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
 system_size = system_size_f
+
+loan = st.sidebar_checkbox("Payment Over Time with Loan?")
+if loan:
+    loan_length = st.sidebar_slider("Length of time for loan (years):",0,20)
+    loan_interest_input = st.sidebar_slider("Annual Interest Rate:",0,30,15)
+    loan_interest = loan_interest_input / 100
+    monthly_payment = st.sidebar_number_input("Desired monthly payment amount:")
+else:
+    st.sidebar_write("Payment added to upfront costs.")
  
 #gross cost baseline
 fixed_gross_per_w = 1.54
@@ -128,20 +158,36 @@ if uploaded_file is not None:
     fixed_raw_gen = system_size_f * fixed_sp_yield
     tracker_raw_gen = system_size_t * tracker_sp_yield
 
-    fixed_usable_per = 0.85 if fixed_raw_gen > total_baseline_kwh else 1.0
-    tracker_usable_per = 0.70 if tracker_raw_gen > total_baseline_kwh else 1.0
-
     #fixed calculations
     fixed_yearly = target_cap_kw * 1350
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
+    num_modules_f = round((total_baseline_kwh * 1000) / (435 * 1680))
+    pv_modules_f = num_modules_f * base_panel
+    inverter_f = 0.12 * (435 * num_modules_f)
+    electrical_bos_cost = elecbos_w * 1000 * pv_modules_f
+    labor_cost = labor_rate * labor_hours
+    acc_total = acc_cost * (435 * num_modules_f)
+    fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
 
     #tracker calculations
     tracker_yearly = target_cap_kw * (1350 * 1.25)
     tracker_itc = tracker_cap * itc_rate
     tracker_basis = tracker_cap - (tracker_itc * 0.5)
     tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
+    kw_dc = 435 * complexity
+    target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
+    num_modules_t = (total_baseline_kwh / (0.435 * 2360))
+    num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
+    new_t_rec = st.sidebar_write("Recommended: ,{new_t_rec}, trackers")
+    pv_modules_t = num_modules_t * base_panel
+    inverter_t = inverter_rate * target_sys_t * 1000
+    mounting = 233600
+    struc_t = 15360
+    elecbos_t = elecbos_w * target_sys_t * 1000
+    acc_total_t = acc_cost * target_sys_t
+    tracker_upfront = pv_modules_t + inverter_t + mounting + struc_t + labor_cost + acc_total_t
 
     ann_baseline_spending = total_baseline_kwh * elec_current
 
@@ -152,6 +198,18 @@ if uploaded_file is not None:
 
     for i in range(total_yrs):
         yr_num = i + 1
+
+        if loan:
+            yearly_payment_f = fixed_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
+            yearly_payment_t = tracker_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
+
+        else:
+            if i == 0:
+                yearly_payment_f = fixed_upfront
+                yearly_payment_t = tracker_upfront
+            else:
+                yearly_payment_f = 0
+                yearly_payment_t = 0
 
         #rising rates
         utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
@@ -181,7 +239,7 @@ if uploaded_file is not None:
         fixed_offset = fixed_gen_usable * elec_current * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred 
+        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly
         
         #net fixed
         cf_fixed += fixed_out_of_pocket
@@ -202,7 +260,7 @@ if uploaded_file is not None:
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
         #net tracker
-        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred
+        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
@@ -337,3 +395,4 @@ if uploaded_file is not None:
 
 else:
     st.write("Please upload a CSV file of your Green Button Data.")
+
