@@ -81,7 +81,7 @@ num_trackers = st.sidebar.slider("Number of trackers:", 1, 50, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
 system_size = system_size_f
 
-loan = st.sidebar_checkbox("Payment Over Time with Loan?")
+loan = st.sidebar.checkbox("Payment Over Time with Loan?")
 if loan:
     loan_length = st.sidebar_slider("Length of time for loan (years):",0,20)
     loan_interest_input = st.sidebar_slider("Annual Interest Rate:",0,30,15)
