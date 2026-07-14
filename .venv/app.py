@@ -83,12 +83,12 @@ system_size = system_size_f
 
 loan = st.sidebar.checkbox("Payment Over Time with Loan?")
 if loan:
-    loan_length = st.sidebar_slider("Length of time for loan (years):",0,20)
-    loan_interest_input = st.sidebar_slider("Annual Interest Rate:",0,30,15)
+    loan_length = st.sidebar.slider("Length of time for loan (years):",0,20)
+    loan_interest_input = st.sidebar.slider("Annual Interest Rate:",0,30,15)
     loan_interest = loan_interest_input / 100
-    monthly_payment = st.sidebar_number_input("Desired monthly payment amount:")
+    monthly_payment = st.sidebar.number_input("Desired monthly payment amount:")
 else:
-    st.sidebar_write("Payment added to upfront costs.")
+    st.sidebar.write("Payment added to upfront costs.")
  
 #gross cost baseline
 fixed_gross_per_w = 1.54
@@ -180,7 +180,7 @@ if uploaded_file is not None:
     target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
-    new_t_rec = st.sidebar_write("Recommended: ,{new_t_rec}, trackers")
+    new_t_rec = st.sidebar.write("Recommended: ,{new_t_rec}, trackers")
     pv_modules_t = num_modules_t * base_panel
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
