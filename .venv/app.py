@@ -40,10 +40,10 @@ roof_dec = float(roof_percent) / 100
 disc_rate=st.sidebar.slider("Discount rate (%):",min_value=0.0, max_value=15.0, value=7.0, step=0.5) / 100
 sdge_rate = st.sidebar.selectbox("Rate Plan",["SDG&E TOU-A", "SDG&E AL-TOU", "SDG&E AL-TOU-2", "SDG&E TOU-DR2", "SDG&E AL-TOU-L", "SDG&E DG-R-L", "SDG&E TOU-M", "SDG&E AL-TOU-M", "SDG&E DG-R-M", "SDG&E TOU-A2", "SDG&E TOU-A3"])
 rate_mapping = {
-    "SDG&E TOU-A": [0.57574,0.42312,0.43513,0.33589],   #summer_peak, summer_offpeak, winter_peak, winter_offpeak
+    "SDG&E TOU-A": [0.57574,0.42312, 0.42312, 0.43513,0.33589, 0.33589],   #summer_peak, summer_offpeak, winter_peak, winter_offpeak
     "SDG&E AL-TOU": [0.242, 0.151, 0.132, 0.264, 0.154, 0.121], #sum_peak, sum_offpeak, sum_sop, winter_peak, winter_offpeak, winter_sop, off p  sop
     "SDG&E AL-TOU-2": [0.2586, 0.16378, 0.14437, 0.28212, 0.16654, 0.13301],  #sum_peak, sum_offpeak, sum_sop, winter_peak, win_offpeak, win)sop
-    "SDG&E TOU-DR2": [0.68907, 0.41773, 0.61014, 0.47316], #sum_peak, sum_offpeak, winter_peak, winter_offpeak
+    "SDG&E TOU-DR2": [0.68907, 0.41773, 0.41773, 0.61014, 0.47316, 0.47316], #sum_peak, sum_offpeak, winter_peak, winter_offpeak
     "SDG&E AL-TOU-L": [0.28315,0.17847, 0.15744, 0.30956, 0.18192, 0.1449], #sum_peak, offpeak, sop, winter_peak, offpeak, sop
     "SDG&E DG-R-L": [0.16417, 0.29004, 0.18206, 0.7732, 0.20089, 0.17241],
     "SDG&E TOU-M": [0.6229,0.30936, 0.23389, 0.3332, 0.24944, 0.22592],
