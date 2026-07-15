@@ -268,7 +268,7 @@ if uploaded_file is not None:
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
 
         #current baseline
-        current_spending = total_baseline_kwh * elec_current * utility_escalation_factor
+        current_spending = total_baseline_kwh * rate_final * utility_escalation_factor
         cash_flow_base += current_spending
         cash_flow_base_pv += current_spending * disc_factor 
         baseline_trend.append(cash_flow_base)
@@ -305,7 +305,7 @@ if uploaded_file is not None:
         else:
             excess_t = tracker_gen - total_baseline_kwh
             tracker_gen_usable = total_baseline_kwh + excess_t * excess_credit_rate
-        tracker_offset = tracker_gen_usable * elec_current * utility_escalation_factor
+        tracker_offset = tracker_gen_usable * rate_final * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
