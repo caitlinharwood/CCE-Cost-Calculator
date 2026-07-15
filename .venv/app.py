@@ -164,7 +164,7 @@ if uploaded_file is not None:
         usage = raw_usage.head(8760)
         total_baseline_kwh = usage.sum()
 
-    usage_date = pd.to_datetime(df[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce').dropna()
+    usage_date = pd.to_datetime(df[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce')
     month = usage_date.dt.month
     hour = usage_date.dt.hour
 
