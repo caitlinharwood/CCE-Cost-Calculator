@@ -124,6 +124,17 @@ if uploaded_file is not None:
         index = col_index
     )
 
+    for i, col in enumerate(all_columns):
+        col_lower = col.lower()
+        if 'start' in col_lower:
+            col_index = i
+            break
+    target_column_date = st.selectbox(
+        "Please select the column that contains the date:",
+        options = all_columns,
+        index = col_index
+    )
+
     #elec_current = float(elec_current_input)
     fixed_sp_yield = 1450
     tracker_sp_yield = 1900
@@ -152,6 +163,48 @@ if uploaded_file is not None:
     else:
         usage = raw_usage.head(8760)
         total_baseline_kwh = usage.sum()
+
+    usage_date = pd.to_numeric(df[target_column_date]).dropna()
+
+    df['Parsed_Time'] = pd.to_datetime(df[target_column_date], format='%m/%d/%Y %I:%M/%S %p')
+    month = df['Parsed_Time'].dt.month
+    hour = df['Parsed_Time'].dt.hour
+
+    sum_peak_cond = (month.isin([6,7,8,9,10])) & ((hour >=16) & (hour <=21))
+    sum_offpeak_cond = (month.isin([6,7,8,9,10])) & (((hour >= 6) & (hour <=10)) | ((hour >= 14) & (hour < 16)) | hour > 21)
+    sum_soffpeak_cond = (month.isin([6,7,8,9,10])) & ((hour < 6) | ((hour >= 10) & (hour < 14)))
+
+    win_peak_cond = (month.isin([1,2,3,4,5,11,12])) & ((hour >=16) & (hour <=21))
+    win_offpeak_cond = (month.isin([1,2,3,4,5,11,12])) & (((hour >= 6) & (hour <=10)) | ((hour >= 14) & (hour < 16)) | hour > 21)
+    win_soffpeak_cond = (month.isin([1,2,3,4,5,11,12])) & ((hour < 6) | ((hour > 10) & (hour < 14)))
+
+    conditions = [
+        sum_peak_cond,
+        sum_offpeak_cond,
+        sum_soffpeak_cond,
+        win_peak_cond,
+        win_offpeak_cond,
+        win_soffpeak_cond
+    ] 
+
+    elec_options = [
+        elec_current[0],
+        elec_current[1],
+        elec_current[2],
+        elec_current[3],
+        elec_current[4],
+        elec_current[5],
+    ]
+
+    df['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
+
+
+    #summer: june 1 - oct 31
+    #winter: nov 1 - may 31
+
+    #peak: 4pm - 9pm
+    #off-peak: 6am - 10am, 2pm - 4pm, 9pm - 12am
+    #super off-peak: 12am - 6am, 10am - 2pm
 
     target_cap_kw = num_trackers * tracker_kw
 
@@ -204,7 +257,7 @@ if uploaded_file is not None:
             yearly_payment_t = tracker_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
 
         else:
-            if i == 0:
+            if i == 1:
                 yearly_payment_f = fixed_upfront
                 yearly_payment_t = tracker_upfront
             else:
