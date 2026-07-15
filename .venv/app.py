@@ -86,7 +86,6 @@ if loan:
     loan_length = st.sidebar.slider("Length of time for loan (years):",0,20)
     loan_interest_input = st.sidebar.slider("Annual Interest Rate:",0,30,15)
     loan_interest = loan_interest_input / 100
-    monthly_payment = st.sidebar.number_input("Desired monthly payment amount:")
 else:
     st.sidebar.write("Payment added to upfront costs.")
  
@@ -194,7 +193,7 @@ if uploaded_file is not None:
         elec_current[5],
     ]
 
-    df['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
+    rate_final = df['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
 
 
     #summer: june 1 - oct 31
@@ -231,7 +230,7 @@ if uploaded_file is not None:
     target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
-    new_t_rec = st.sidebar.write("Recommended: ,{new_t_rec}, trackers")
+    st.sidebar.write(f"Recommended:{num_trackers_rec} trackers")
     pv_modules_t = num_modules_t * base_panel
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
@@ -240,7 +239,7 @@ if uploaded_file is not None:
     acc_total_t = acc_cost * target_sys_t
     tracker_upfront = pv_modules_t + inverter_t + mounting + struc_t + labor_cost + acc_total_t
 
-    ann_baseline_spending = total_baseline_kwh * elec_current
+    ann_baseline_spending = total_baseline_kwh * rate_final
 
     cash_flow_base = 0.0
 
@@ -287,7 +286,7 @@ if uploaded_file is not None:
             excess_f = fixed_gen - total_baseline_kwh
             fixed_gen_usable = total_baseline_kwh + excess_f * excess_credit_rate
 
-        fixed_offset = fixed_gen_usable * elec_current * utility_escalation_factor      #fixed utility savings
+        fixed_offset = fixed_gen_usable * rate_final * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly
