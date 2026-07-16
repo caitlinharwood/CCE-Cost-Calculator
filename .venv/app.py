@@ -151,17 +151,27 @@ if uploaded_file is not None:
     cf_tracker = tracker_net_inv
     cf_fixed_pv = fixed_net_inv
     cf_tracker_pv = tracker_net_inv
-
+    
+    ######
     raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
 
+    df['usage_parsed'] = pd.to_numeric(df[target_column], errors='coerce')
+    df_clean = df.dropna(subset=['usage_parsed', target_column_date]).copy()
+
     #15 min or hourly intervals
-    if len(raw_usage) > 15000:
-        usage = raw_usage.head(35040)
-        total_baseline_kwh = usage.sum() / 4.0
+    if len(df_clean) > 15000:
+        # usage= raw_usage.head(35040)
+        df_clean = df_clean.head(35040)
+        df_clean['usage_hourly_eq'] = df_clean['usage_parsed'] / 4.0
+        #total_baseline_kwh = usage.sum() / 4.0
 
     else:
-        usage = raw_usage.head(8760)
-        total_baseline_kwh = usage.sum()
+        #usage = raw_usage.head(8760)
+        #total_baseline_kwh = usage.sum()
+        df_clean = df_clean.head(8760)
+        df_clean['usage_hourly_eq'] = df_clean['usage_parsed']
+
+    total_baseline_kwh = df_clean['usage_hourly_eq'].sum()
 
     usage_date = pd.to_datetime(df[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce')
     month = usage_date.dt.month
@@ -186,8 +196,13 @@ if uploaded_file is not None:
 
     elec_options = elec_current[:6]
 
-    rate_final = df['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
+    df_clean['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
 
+    df_clean['initial_row_cost'] = df_clean['usage_hourly_eq'] * df_clean['elec_current_val']
+    base_yr_spend = df_clean['initial_row_cost'].sum()
+                                                                          
+    eff_rate_blend = df_clean['elec_current_val'].mean() if len(df_clean) > 0 else np.nan
+    
     #summer: june 1 - oct 31
     #winter: nov 1 - may 31
 
@@ -231,7 +246,7 @@ if uploaded_file is not None:
     acc_total_t = acc_cost * target_sys_t
     tracker_upfront = pv_modules_t + inverter_t + mounting + struc_t + labor_cost + acc_total_t
 
-    ann_baseline_spending = total_baseline_kwh * rate_final
+    #ann_baseline_spending = total_baseline_kwh * rate_final
 
     cash_flow_base = 0.0
 
@@ -261,7 +276,7 @@ if uploaded_file is not None:
 
         #current baseline
         #current_spending = total_baseline_kwh * rate_final * utility_escalation_factor
-        current_spending = (df['elec_current_val'] * df['usage']).sum
+        current_spending = base_yr_spend * utility_escalation_factor
         cash_flow_base += current_spending
         cash_flow_base_pv += current_spending * disc_factor 
         baseline_trend.append(cash_flow_base)
@@ -279,10 +294,10 @@ if uploaded_file is not None:
             excess_f = fixed_gen - total_baseline_kwh
             fixed_gen_usable = total_baseline_kwh + excess_f * excess_credit_rate
 
-        fixed_offset = fixed_gen_usable * rate_final * utility_escalation_factor      #fixed utility savings
+        fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly
+        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly + yearly_payment_f
         
         #net fixed
         cf_fixed += fixed_out_of_pocket
@@ -298,12 +313,13 @@ if uploaded_file is not None:
         else:
             excess_t = tracker_gen - total_baseline_kwh
             tracker_gen_usable = total_baseline_kwh + excess_t * excess_credit_rate
-        tracker_offset = tracker_gen_usable * rate_final * utility_escalation_factor
+        
+        tracker_offset = tracker_gen_usable * eff_rate_blend * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
         #net tracker
-        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly
+        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly + yearly_payment_t
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
