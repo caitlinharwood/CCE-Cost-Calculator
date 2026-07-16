@@ -173,9 +173,9 @@ if uploaded_file is not None:
 
     total_baseline_kwh = df_clean['usage_hourly_eq'].sum()
 
-    usage_date = pd.to_datetime(df[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce')
-    month = usage_date.dt.month
-    hour = usage_date.dt.hour
+    usage_date = pd.to_datetime(df_clean[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce')
+    month = usage_date.dt.month.fillna(1)
+    hour = usage_date.dt.hour.fillna(0)
 
     sum_peak_cond = (month.isin([6,7,8,9,10])) & ((hour >=16) & (hour <=21))
     sum_offpeak_cond = (month.isin([6,7,8,9,10])) & (((hour >= 6) & (hour <=10)) | ((hour >= 14) & (hour < 16)) | hour > 21)
