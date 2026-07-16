@@ -129,7 +129,7 @@ if uploaded_file is not None:
             col_index = i
             break
     target_column_date = st.selectbox(
-        "Please select the column that contains the date:",
+        #"Please select the column that contains the date:",
         options = all_columns,
         index = col_index
     )
@@ -184,17 +184,9 @@ if uploaded_file is not None:
         win_soffpeak_cond
     ] 
 
-    elec_options = [
-        elec_current[0],
-        elec_current[1],
-        elec_current[2],
-        elec_current[3],
-        elec_current[4],
-        elec_current[5],
-    ]
+    elec_options = elec_current[:6]
 
     rate_final = df['elec_current_val'] = np.select(conditions, elec_options, default = np.nan)
-
 
     #summer: june 1 - oct 31
     #winter: nov 1 - may 31
@@ -268,7 +260,8 @@ if uploaded_file is not None:
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
 
         #current baseline
-        current_spending = total_baseline_kwh * rate_final * utility_escalation_factor
+        #current_spending = total_baseline_kwh * rate_final * utility_escalation_factor
+        current_spending = (df['elec_current_val'] * df['usage']).sum
         cash_flow_base += current_spending
         cash_flow_base_pv += current_spending * disc_factor 
         baseline_trend.append(cash_flow_base)
