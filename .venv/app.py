@@ -118,7 +118,7 @@ if uploaded_file is not None:
             col_index = i
             break
     target_column = st.selectbox(
-        "Please select the column that contains your electricty consumption data:",
+        "Column containing electricty consumption data:",
         options = all_columns,
         index = col_index
     )
@@ -129,7 +129,7 @@ if uploaded_file is not None:
             col_index = i
             break
     target_column_date = st.selectbox(
-        #"Please select the column that contains the date:",
+        "Column containing date/time:",
         options = all_columns,
         index = col_index
     )
