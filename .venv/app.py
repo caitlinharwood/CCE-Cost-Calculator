@@ -83,7 +83,7 @@ system_size = system_size_f
 
 loan = st.sidebar.checkbox("Payment Over Time with Loan?")
 if loan:
-    loan_length = st.sidebar.slider("Length of time for loan (years):",0,20)
+    loan_length = st.sidebar.slider("Length of time for loan (years):",0,20,20)
     loan_interest_input = st.sidebar.slider("Annual Interest Rate:",0,30,15)
     loan_interest = loan_interest_input / 100
 else:
@@ -329,6 +329,7 @@ if uploaded_file is not None:
         tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
         disc_factor = (1 + disc_rate) ** i
+        i += 1
 
 
     target_len = len(years)
