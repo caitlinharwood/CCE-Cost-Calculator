@@ -144,13 +144,7 @@ if uploaded_file is not None:
     fixed_trend_pv = []
     tracker_trend_pv = []
 
-    #set baseline
-    cash_flow_base = 0.0
-    cash_flow_base_pv = 0.0
-    #cf_fixed = fixed_net_inv
-    #cf_tracker = tracker_net_inv
-    #cf_fixed_pv = fixed_net_inv
-    #cf_tracker_pv = tracker_net_inv
+    cf_tracker_pv = tracker_net_inv
     
     ######
     raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
@@ -248,6 +242,9 @@ if uploaded_file is not None:
 
     #ann_baseline_spending = total_baseline_kwh * rate_final
 
+    fixed_yearly_opex = system_size_f * 5.0
+    tracker_yearly_opex = system_size_t * 8.0
+
     if loan:
         cf_fixed = 0.0
         cf_tracker = 0.0
@@ -260,7 +257,7 @@ if uploaded_file is not None:
         cf_tracker_pv = tracker_upfront
 
     cash_flow_base = 0.0
-
+    cash_flow_base_pv = 0.0
     fixed_ann_savings = []
     tracker_ann_savings = []
 
@@ -307,7 +304,7 @@ if uploaded_file is not None:
         fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly + current_loan_f
+        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         
         #net fixed
         cf_fixed += fixed_out_of_pocket
@@ -329,7 +326,7 @@ if uploaded_file is not None:
         tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         
         #net tracker
-        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly + current_loan_t
+        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly_opex + current_loan_t
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
