@@ -84,7 +84,7 @@ system_size = system_size_f
 loan = st.sidebar.checkbox("Payment Over Time with Loan?")
 if loan:
     loan_length = st.sidebar.slider("Length of time for loan (years):",0,20,20)
-    loan_interest_input = st.sidebar.slider("Annual Interest Rate:",0,30,15)
+    loan_interest_input = st.sidebar.slider("Annual Interest Rate:",0,25,6)
     loan_interest = loan_interest_input / 100
 else:
     st.sidebar.write("Payment added to upfront costs.")
@@ -261,13 +261,16 @@ if uploaded_file is not None:
     fixed_ann_savings = []
     tracker_ann_savings = []
 
-    if loan and loan_length > 0:
-            yearly_payment_f = fixed_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
-            yearly_payment_t = tracker_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
+    if loan and loan_length > 0 and loan_interest > 0:
+        yearly_payment_f = fixed_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
+        yearly_payment_t = tracker_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
 
+    elif loan and loan_length > 0 and loan_interest == 0:
+        yearly_payment_f = fixed_upfront / loan_length
+        yearly_payment_t = tracker_upfront / loan_length
     else:
-            yearly_payment_f = 0.0
-            yearly_payment_t = 0.0
+        yearly_payment_f = 0.0
+        yearly_payment_t = 0.0
 
     for i in range(total_yrs):
         yr_num = i + 1
@@ -332,8 +335,11 @@ if uploaded_file is not None:
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
         tracker_trend_pv.append(cf_tracker_pv)
 
-        fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
-        tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
+        #fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
+        #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
+
+        fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
+        tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
 
     target_len = len(years)
 
