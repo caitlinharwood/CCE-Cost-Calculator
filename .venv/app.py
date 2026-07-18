@@ -94,14 +94,12 @@ fixed_gross_per_w = 1.54
 tracker_gross_per_w = 2.50
 
 #upfront costs
-fixed_cap = (system_size_f * 1000 * base_panel) + com_costs
-tracker_cap = (system_size_t * 1000 * base_panel) + (num_trackers * machinery_cost) + com_costs
+#fixed_cap = (system_size_f * 1000 * base_panel) + com_costs
+#tracker_cap = (system_size_t * 1000 * base_panel) + (num_trackers * machinery_cost) + com_costs
 
-fixed_itc_value = fixed_cap * itc_rate
-tracker_itc_value = tracker_cap * itc_rate
 
-fixed_net_inv = fixed_cap - fixed_itc_value
-tracker_net_inv = tracker_cap - tracker_itc_value
+#fixed_net_inv = fixed_cap - fixed_itc_value
+#tracker_net_inv = tracker_cap - tracker_itc_value
 
 uploaded_file = st.file_uploader("Please upload a CSV file of your Green Button Data:", type=["csv"])
 
@@ -144,7 +142,7 @@ if uploaded_file is not None:
     fixed_trend_pv = []
     tracker_trend_pv = []
 
-    cf_tracker_pv = tracker_net_inv
+    #cf_tracker_pv = tracker_net_inv
     
     ######
     raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
@@ -166,6 +164,8 @@ if uploaded_file is not None:
         df_clean['usage_hourly_eq'] = df_clean['usage_parsed']
 
     total_baseline_kwh = df_clean['usage_hourly_eq'].sum()
+
+    num_modules_f = round((total_baseline_kwh * 1000) / (435 * 1680))
 
     usage_date = pd.to_datetime(df_clean[target_column_date], format='%m/%d/%Y %I:%M/%S %p', errors = 'coerce')
     month = usage_date.dt.month.fillna(1)
@@ -211,22 +211,20 @@ if uploaded_file is not None:
 
     #fixed calculations
     fixed_yearly = target_cap_kw * 1350
+    pv_modules_f = num_modules_f * base_panel * 435
+    inverter_f = inverter_rate * (435 * num_modules_f)
+    electrical_bos_cost = elecbos_w * (435 * num_modules_f)
+    labor_cost = labor_rate * labor_hours
+    acc_total = acc_cost * (435 * num_modules_f)
+    
+    fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
+    fixed_cap = fixed_upfront
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
-    num_modules_f = round((total_baseline_kwh * 1000) / (435 * 1680))
-    pv_modules_f = num_modules_f * base_panel
-    inverter_f = 0.12 * (435 * num_modules_f)
-    electrical_bos_cost = elecbos_w * 1000 * pv_modules_f
-    labor_cost = labor_rate * labor_hours
-    acc_total = acc_cost * (435 * num_modules_f)
-    fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
 
     #tracker calculations
-    tracker_yearly = target_cap_kw * (1350 * 1.25)
-    tracker_itc = tracker_cap * itc_rate
-    tracker_basis = tracker_cap - (tracker_itc * 0.5)
-    tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
+    #tracker_yearly = target_cap_kw * (1350 * 1.25)
     kw_dc = 435 * complexity
     target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
@@ -238,7 +236,14 @@ if uploaded_file is not None:
     struc_t = 15360
     elecbos_t = elecbos_w * target_sys_t * 1000
     acc_total_t = acc_cost * target_sys_t
+    
     tracker_upfront = pv_modules_t + inverter_t + mounting + struc_t + labor_cost + acc_total_t
+    tracker_cap = tracker_upfront
+    tracker_itc = tracker_cap * itc_rate
+    tracker_basis = tracker_cap - (tracker_itc * 0.5)
+    tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
+
+
 
     #ann_baseline_spending = total_baseline_kwh * rate_final
 
