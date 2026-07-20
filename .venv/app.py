@@ -392,7 +392,7 @@ if uploaded_file is not None:
         x=chart_data["Year"],
         y=[chart_data["Current"], chart_data["Fixed"], chart_data["Tracking"]],
         labels = {"Spending": "Cumulative Spending ($)", "variable": "Scenario"},
-        title = "20-Year Cumulative Spending"
+        title = "20-Year Cumulative Spending",
         color_discrete_map = {
             "Current": "red",
             "Fixed": "lightskyblue",
