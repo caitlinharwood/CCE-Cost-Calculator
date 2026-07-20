@@ -393,6 +393,11 @@ if uploaded_file is not None:
         y=[chart_data["Current"], chart_data["Fixed"], chart_data["Tracking"]],
         labels = {"Spending": "Cumulative Spending ($)", "variable": "Scenario"},
         title = "20-Year Cumulative Spending"
+        color_discrete_map = {
+            "Current": "red",
+            "Fixed": "lightskyblue",
+            "Tracking": "blue"
+        }
     )
 
     if break_even_f is not None:
@@ -414,7 +419,7 @@ if uploaded_file is not None:
         fig.add_vline(
             x = break_even_t,
             line_dash = "dash",
-            line_color = "red",
+            line_color = "blue",
             line_width = 1
         )
         fig.add_annotation(
@@ -448,7 +453,7 @@ if uploaded_file is not None:
         barmode = "group",
         color_discrete_map = {
             "Fixed Solar Savings": "lightskyblue",
-            "Tracker Solar Savings": "red"
+            "Tracker Solar Savings": "blue"
         },
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
