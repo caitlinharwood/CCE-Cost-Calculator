@@ -93,14 +93,7 @@ else:
 fixed_gross_per_w = 1.54
 tracker_gross_per_w = 2.50
 
-#upfront costs
-#fixed_cap = (system_size_f * 1000 * base_panel) + com_costs
-#tracker_cap = (system_size_t * 1000 * base_panel) + (num_trackers * machinery_cost) + com_costs
-
-
-#fixed_net_inv = fixed_cap - fixed_itc_value
-#tracker_net_inv = tracker_cap - tracker_itc_value
-
+#csv file from user
 uploaded_file = st.file_uploader("Please upload a CSV file of your Green Button Data:", type=["csv"])
 
 #get csv info
@@ -290,7 +283,6 @@ if uploaded_file is not None:
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
 
         #current baseline
-        #current_spending = total_baseline_kwh * rate_final * utility_escalation_factor
         current_spending = base_yr_spend * utility_escalation_factor
         cash_flow_base += current_spending
         cash_flow_base_pv += current_spending * disc_factor 
@@ -343,8 +335,11 @@ if uploaded_file is not None:
         #fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
-        fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
-        tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
+        #fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
+        #tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
+
+        fixed_ann_savings.append(current_spending - cf_fixed)
+        tracker_ann_savings.append(current_spending - cf_tracker)
 
     target_len = len(years)
 
@@ -462,7 +457,6 @@ if uploaded_file is not None:
     fig_bar.update_layout(
         xaxis = dict(tickmode = 'linear', tick0 = 1, dtick = 1, title = "Year"),
         yaxis = dict(title = "Savings ($ / Year)")
-        #hovermode = "x unified"
     )
     st.plotly_chart(fig_bar, use_container_width = True)
 
