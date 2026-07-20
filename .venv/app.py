@@ -448,7 +448,7 @@ if uploaded_file is not None:
         barmode = "group",
         color_discrete_map = {
             "Fixed Solar Savings": "lightskyblue",
-            "Tracker Solar Savings": "red",
+            "Tracker Solar Savings": "red"
         }
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
