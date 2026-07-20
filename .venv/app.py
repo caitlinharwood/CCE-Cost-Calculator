@@ -237,10 +237,6 @@ if uploaded_file is not None:
     tracker_basis = tracker_cap - (tracker_itc * 0.5)
     tracker_mac = [round(tracker_basis * r * fed_tax) for r in macrs_rates]
 
-
-
-    #ann_baseline_spending = total_baseline_kwh * rate_final
-
     fixed_yearly_opex = system_size_f * 5.0
     tracker_yearly_opex = system_size_t * 8.0
 
@@ -333,10 +329,10 @@ if uploaded_file is not None:
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
         tracker_trend_pv.append(cf_tracker_pv)
 
-        #fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
+        fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
-        fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
+        #fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
 
 
