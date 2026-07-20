@@ -74,7 +74,7 @@ used_area = roof_size * roof_dec
 system_size_f = used_area / 15            #capacity in kW
 
 if roof_size:
-    num_trackers_rec = max(1, round(system_size_f / tracker_kw))
+    num_trackers_rec = max(1, round(system_size_f / tracker_kw)) - 15
 else:
     num_trackers_rec = 10
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 25, num_trackers_rec)
@@ -446,6 +446,7 @@ if uploaded_file is not None:
         x = "Year",
         y = ["Fixed Solar Savings", "Tracker Solar Savings"],
         barmode = "group",
+        bar_color = ["lightskyblue","red"]
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
     )
