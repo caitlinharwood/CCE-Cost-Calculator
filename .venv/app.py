@@ -446,7 +446,7 @@ if uploaded_file is not None:
         x = "Year",
         y = ["Fixed Solar Savings", "Tracker Solar Savings"],
         barmode = "group",
-        bar_color = ["lightskyblue","red"]
+        bar_color = ["lightskyblue","red"],
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
     )
