@@ -77,7 +77,7 @@ if roof_size:
     num_trackers_rec = max(1, round(system_size_f / tracker_kw))
 else:
     num_trackers_rec = 10
-num_trackers = st.sidebar.slider("Number of trackers:", 1, 50, num_trackers_rec)
+num_trackers = st.sidebar.slider("Number of trackers:", 1, 25, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
 system_size = system_size_f
 
@@ -196,7 +196,7 @@ if uploaded_file is not None:
     #peak: 4pm - 9pm
     #off-peak: 6am - 10am, 2pm - 4pm, 9pm - 12am
     #super off-peak: 12am - 6am, 10am - 2pm
-
+    system_size_f = (num_modules_f * 435) / 1000
     target_cap_kw = num_trackers * tracker_kw
 
     fixed_raw_gen = system_size_f * fixed_sp_yield
@@ -209,6 +209,7 @@ if uploaded_file is not None:
     electrical_bos_cost = elecbos_w * (435 * num_modules_f)
     labor_cost = labor_rate * labor_hours
     acc_total = acc_cost * (435 * num_modules_f)
+
     
     fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
     fixed_cap = fixed_upfront
@@ -335,11 +336,9 @@ if uploaded_file is not None:
         #fixed_ann_savings.append(fixed_offset - fixed_om + f_macrs_cred)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
-        #fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
-        #tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
+        fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
+        tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
 
-        fixed_ann_savings.append(current_spending - cf_fixed)
-        tracker_ann_savings.append(current_spending - cf_tracker)
 
     target_len = len(years)
 
@@ -460,7 +459,5 @@ if uploaded_file is not None:
     )
     st.plotly_chart(fig_bar, use_container_width = True)
 
-
 else:
     st.write("Please upload a CSV file of your Green Button Data.")
-
