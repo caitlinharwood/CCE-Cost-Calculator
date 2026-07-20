@@ -446,7 +446,10 @@ if uploaded_file is not None:
         x = "Year",
         y = ["Fixed Solar Savings", "Tracker Solar Savings"],
         barmode = "group",
-        color = ["lightskyblue","red"],
+        color_discrete_map = {
+            "Fixed Solar Savings": "lightskyblue",
+            "Tracker Solar Savings": "red",
+        }
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
     )
