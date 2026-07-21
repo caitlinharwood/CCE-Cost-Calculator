@@ -223,7 +223,7 @@ if uploaded_file is not None:
     target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
-    st.sidebar.write(f"Recommended:{num_trackers_rec} trackers")
+    st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
     pv_modules_t = num_modules_t * base_panel
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
@@ -489,6 +489,16 @@ if uploaded_file is not None:
         labels = {"value": "Annual Net Savings ($)", "variable": "Option"},
         title = "Annual Savings Comparison"
     )
+
+    for yr in years:
+        fig.add_vline(
+            x = yr,
+            line_width = 0.5,
+            line_dash = "solid",
+            line_color = "lightgray",
+            layer = "below"
+        )
+        
     fig_bar.update_layout(
         xaxis = dict(tickmode = 'linear', tick0 = 1, dtick = 1, title = "Year"),
         yaxis = dict(title = "Savings ($ / Year)")
