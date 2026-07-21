@@ -448,7 +448,7 @@ if uploaded_file is not None:
         x = 6,
         y = 1.02,
         text = "MACRS Credit Ends",
-        showarow = False,
+        showarrow = False,
         font = dict(color = "black", size = 11)
         )
 
