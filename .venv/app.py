@@ -330,7 +330,7 @@ if uploaded_file is not None:
         
         if not loan and yr_num == 1:
             tracker_out_of_pocket += tracker_upfront
-            
+
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
@@ -437,6 +437,28 @@ if uploaded_file is not None:
             font = dict(color = "black", size = 11)
         )
     
+    fig.add_vline(
+        x = 6, 
+        line_width = 1,
+        line_dash = "dot",
+        line_color = "#740606"
+        )
+    fig.add_annotation(
+        x = 6,
+        y = max(baseline_trend),
+        text = "MACRS Credit",
+        showarow = False,
+        font = dict(color = "black", size = 11)
+        )
+
+    for yr in years:
+        fig.add_vline(
+            x = yr,
+            line_width = 1,
+            line_dash = "solid",
+            line_color = "lightgray"
+        )
+
     fig.update_layout(
         xaxis = dict(tickmode = 'linear', tick0 = 1, dtick = 1, title = "Year"),
         yaxis = dict(title = "Spending ($)"),
