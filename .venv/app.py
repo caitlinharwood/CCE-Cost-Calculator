@@ -334,6 +334,9 @@ if uploaded_file is not None:
 
         fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
+        st.write(current_spending)
+        st.write(fixed_out_of_pocket)
+        st.write(fixed_ann_savings)
 
 
     target_len = len(years)
