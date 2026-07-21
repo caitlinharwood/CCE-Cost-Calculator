@@ -443,10 +443,13 @@ if uploaded_file is not None:
         line_dash = "dot",
         line_color = "#740606"
         )
+    
+    y_max = max(baseline_trend) if baseline_trend else 1000000,
+
     fig.add_annotation(
         x = 6,
-        y = max(baseline_trend),
-        text = "MACRS Credit",
+        y = y_max,
+        text = "MACRS Credit Ends",
         showarow = False,
         font = dict(color = "black", size = 11)
         )
