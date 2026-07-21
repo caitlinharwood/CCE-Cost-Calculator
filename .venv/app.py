@@ -329,10 +329,10 @@ if uploaded_file is not None:
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
         tracker_trend_pv.append(cf_tracker_pv)
 
-        fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
+        #fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
 
-        #fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
+        fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
 
 
@@ -394,7 +394,7 @@ if uploaded_file is not None:
         labels = {"Spending": "Cumulative Spending ($)", "variable": "Scenario"},
         title = "20-Year Cumulative Spending",
         color_discrete_map = {
-            "Current": "#862508",
+            "Current": "#D03C0A",
             "Fixed": "#5DA9E9",
             "Tracking": "#003F91"
         }
