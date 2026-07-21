@@ -444,11 +444,12 @@ if uploaded_file is not None:
         line_color = "#740606"
         )
     
-    y_max = max(baseline_trend) if baseline_trend else 1000000,
+    y_max = max(baseline_trend) if baseline_trend else 1000000
 
     fig.add_annotation(
         x = 6,
-        y = y_max,
+        y = 1.02,
+        yref = "paper",
         text = "MACRS Credit Ends",
         showarow = False,
         font = dict(color = "black", size = 11)
@@ -457,9 +458,10 @@ if uploaded_file is not None:
     for yr in years:
         fig.add_vline(
             x = yr,
-            line_width = 1,
+            line_width = 0.5,
             line_dash = "solid",
-            line_color = "lightgray"
+            line_color = "lightgray",
+            layer = "below"
         )
 
     fig.update_layout(
