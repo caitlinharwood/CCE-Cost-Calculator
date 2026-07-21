@@ -303,6 +303,9 @@ if uploaded_file is not None:
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         
+        if not loan and yr_num == 1:
+            fixed_out_of_pocket += fixed_upfront
+
         #net fixed
         cf_fixed += fixed_out_of_pocket
         fixed_trend.append(cf_fixed)
@@ -324,6 +327,10 @@ if uploaded_file is not None:
         
         #net tracker
         tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly_opex + current_loan_t
+        
+        if not loan and yr_num == 1:
+            tracker_out_of_pocket += tracker_upfront
+            
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
@@ -334,10 +341,7 @@ if uploaded_file is not None:
 
         fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
-        st.write(current_spending)
-        st.write(fixed_out_of_pocket)
-        st.write(fixed_ann_savings)
-
+        
 
     target_len = len(years)
 
