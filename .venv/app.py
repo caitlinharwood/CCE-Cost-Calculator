@@ -31,7 +31,6 @@ strucural = 48115
 mod_per_tracker = 90
 complexity = 1.08
 
-
 #get user inputs
 st.sidebar.subheader("Inputs:")
 roof_size=st.sidebar.number_input("Area of roof (sq ft): ")
@@ -51,7 +50,6 @@ rate_mapping = {
     "SDG&E DG-R-M": [0.96824, 0.27714, 0.16457, 0.56019, 0.18424, 0.15449],
     "SDG&E TOU-A2": [0.64136, 0.34408, 0.27545, 0.36934, 0.2903, 0.26697],
     "SDG&E TOU-A3": [0.57911, 0.44639, 0.32795, 0.42062, 0.34158, 0.31825]
-
 }
 
 #summer: june 1 - oct 31
@@ -209,7 +207,6 @@ if uploaded_file is not None:
     electrical_bos_cost = elecbos_w * (435 * num_modules_f)
     labor_cost = labor_rate * labor_hours
     acc_total = acc_cost * (435 * num_modules_f)
-
     
     fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
     fixed_cap = fixed_upfront
@@ -419,6 +416,7 @@ if uploaded_file is not None:
             y = max(baseline_trend) * 0.85,
             text = f"Fixed Break-Even Year: {break_even_f}",
             showarrow = False,
+            bgcolor = "white",
             font = dict(color = "black", size = 11)
         )
 
@@ -434,6 +432,7 @@ if uploaded_file is not None:
             y = max(baseline_trend),
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
+            bgcolor = "white",
             font = dict(color = "black", size = 11)
         )
     
@@ -449,6 +448,7 @@ if uploaded_file is not None:
         y = max(baseline_trend),
         text = "MACRS Credit Ends",
         showarrow = False,
+        bgcolor = "white",
         font = dict(color = "black", size = 11)
         )
 
@@ -498,7 +498,7 @@ if uploaded_file is not None:
             line_color = "lightgray",
             layer = "below"
         )
-        
+
     fig_bar.update_layout(
         xaxis = dict(tickmode = 'linear', tick0 = 1, dtick = 1, title = "Year"),
         yaxis = dict(title = "Savings ($ / Year)")
