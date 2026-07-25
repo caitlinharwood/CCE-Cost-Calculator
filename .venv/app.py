@@ -264,6 +264,8 @@ if uploaded_file is not None:
     cash_flow_base_pv = 0.0
     fixed_ann_savings = []
     tracker_ann_savings = []
+    fixed_raw_ann_savings = []
+    tracker_raw_ann_savings = []
 
     if loan and loan_length > 0 and loan_interest > 0:
         yearly_payment_f = fixed_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
@@ -367,6 +369,8 @@ if uploaded_file is not None:
 
         fixed_ann_savings.append(current_spending - fixed_out_of_pocket)
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
+        fixed_raw_ann_savings.append(current_spending - fixed_out_of_pocket_raw)
+        tracker_raw_ann_savings.append(current_spending - tracker_out_of_pocket_raw)
         
 
     target_len = len(years)
@@ -382,11 +386,6 @@ if uploaded_file is not None:
         default = "Free Cash Flow", 
         label_visibility = "collapsed"
         )
-    if free_cash_flow:
-        if free_cash_flow == "Free Cash Flow":
-            cash_flow = 1
-        elif free_cash_flow == "Raw Spending":
-            cash_flow = 0
     
     if use_pv: 
         chart_baseline = baseline_trend_pv
@@ -401,14 +400,6 @@ if uploaded_file is not None:
         y_axis_title = "Spending ($)"
         chart_title = "20-Year Cumulative Spending"
 
-    #if use_pv:
-     #   chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
-      #  y_axis_title = "Present Value of Cumulative Spending ($)"
-       # chart_title = "20-Year Cumulative Spending (Present Value)"
-    #else:
-     #   chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_trend, tracker_trend
-      ## chart_title = "20-Year Cumulative Spending"
-    
     #line graphs
     chart_data = pd.DataFrame({
         "Year": years,
@@ -524,12 +515,20 @@ if uploaded_file is not None:
     st.plotly_chart(fig, use_container_width = True)
 
     #savings chart
-    savings_data = pd.DataFrame({
+    if free_cash_flow == "Raw Spending":
+        savings_data = pd.DataFrame({
+        #higher w tax benefits, finance over time
+        "Year": years,
+        "Fixed Solar Savings": fixed_raw_ann_savings,
+        "Tracker Solar Savings": tracker_raw_ann_savings
+        })
+    else:
+        savings_data = pd.DataFrame({
         #higher w tax benefits, finance over time
         "Year": years,
         "Fixed Solar Savings": fixed_ann_savings,
         "Tracker Solar Savings": tracker_ann_savings
-    })
+        })
 
     fig_bar = px.bar(
         savings_data,
