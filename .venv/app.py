@@ -474,14 +474,12 @@ if uploaded_file is not None:
         )
         fig.add_annotation(
             x = break_even_t,
-            y = max(baseline_trend),
+            y = max(baseline_trend) * 0.92,
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
             bgcolor = "white",
             font = dict(color = "black", size = 11)
         )
-    
-    
     
     if free_cash_flow == "Free Cash Flow":
         fig.add_vline(
