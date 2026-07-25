@@ -347,6 +347,14 @@ if uploaded_file is not None:
         value = True,
     )
 
+    free_cash = st.radio(
+        "Choose",
+        ["on","off"],
+        horizontal = True
+        )
+
+    free_cash2 = st.segmented_control("Displayed values",["one","two"], label_visibilty = "collapsed")
+
     if use_pv:
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
