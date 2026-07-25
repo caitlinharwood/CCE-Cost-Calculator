@@ -51,7 +51,7 @@ rate_mapping = {
     "SDG&E TOU-A2": [0.64136, 0.34408, 0.27545, 0.36934, 0.2903, 0.26697],
     "SDG&E TOU-A3": [0.57911, 0.44639, 0.32795, 0.42062, 0.34158, 0.31825]
 }
-ppw = st.sidebar_slider("Price per Watt ($):",0,4.00,2.25)
+ppw = st.sidebar.slider("Price per Watt ($):",0,4.00,2.25)
 #summer: june 1 - oct 31
 #winter: nov 1 - may 31
 
