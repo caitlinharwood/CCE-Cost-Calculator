@@ -380,7 +380,8 @@ if uploaded_file is not None:
 
     free_cash_flow = st.segmented_control(
         "Displayed values",
-        ["Free Cash Flow","Raw Spending"], 
+        ["Free Cash Flow","Raw Spending"],
+        default = "Free Cash Flow", 
         label_visibility = "collapsed"
         )
     if free_cash_flow:
@@ -389,22 +390,18 @@ if uploaded_file is not None:
         elif free_cash_flow == "Raw Spending":
             cash_flow = 0
     
-    if use_pv and free_cash_flow == "Raw Spending":
-        chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_raw_trend_pv, tracker_raw_trend_pv
+    if use_pv: 
+        chart_baseline = baseline_trend_pv
+        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_trend_pv 
+        chart_tracker = tracker_raw_trend_pv if free_cash_flow == "Raw Spending" else tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
-    elif use_pv and free_cash_flow == "Free Cash Flow":
-        chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
-        y_axis_title = "Present Value of Cumulative Spending ($)"
-        chart_title = "20-Year Cumulative Spending (Present Value)"
-    elif free_cash_flow == "Raw Spending":
-        chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_raw_trend, tracker_raw_trend
-        y_axis_title = "Present Value of Cumulative Spending ($)"
-        chart_title = "20-Year Cumulative Spending (Present Value)"
-    else:    
-        chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_trend, tracker_trend
-        y_axis_title = "Present Value of Cumulative Spending ($)"
-        chart_title = "20-Year Cumulative Spending (Present Value)"
+    else:
+        chart_baseline = baseline_trend
+        chart_fixed = fixed_raw_trend if free_cash_flow == "Raw Spending" else fixed_trend
+        chart_tracker = tracker_raw_trend if free_cash_flow == "Raw Spending" else tracker_trend
+        y_axis_title = "Spending ($)"
+        chart_title = "20-Year Cumulative Spending"
 
     #if use_pv:
      #   chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
@@ -455,7 +452,7 @@ if uploaded_file is not None:
         x=chart_data["Year"],
         y=[chart_data["Current"], chart_data["Fixed"], chart_data["Tracking"]],
         labels = {"Spending": "Cumulative Spending ($)", "variable": "Scenario"},
-        title = "20-Year Cumulative Spending",
+        title = chart_title,
         color_discrete_map = {
             "Current": "#D03C0A",
             "Fixed": "#5DA9E9",
