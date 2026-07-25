@@ -474,7 +474,7 @@ if uploaded_file is not None:
         )
         fig.add_annotation(
             x = break_even_t,
-            y = max(baseline_trend) * 0.92,
+            y = max(baseline_trend) * 0.925,
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
             bgcolor = "white",
