@@ -481,14 +481,15 @@ if uploaded_file is not None:
             font = dict(color = "black", size = 11)
         )
     
-    fig.add_vline(
-        x = 6, 
-        line_width = 1,
-        line_dash = "dot",
-        line_color = "#740606"
-        )
+    
     
     if free_cash_flow == "Free Cash Flow":
+        fig.add_vline(
+            x = 6, 
+            line_width = 1,
+            line_dash = "dot",
+            line_color = "#740606"
+            )
         fig.add_annotation(
             x = 6,
             y = max(baseline_trend),
