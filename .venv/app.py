@@ -488,14 +488,15 @@ if uploaded_file is not None:
         line_color = "#740606"
         )
     
-    fig.add_annotation(
-        x = 6,
-        y = max(baseline_trend),
-        text = "MACRS Credit Ends",
-        showarrow = False,
-        bgcolor = "white",
-        font = dict(color = "black", size = 11)
-        )
+    if free_cash_flow == "Free Cash Flow":
+        fig.add_annotation(
+            x = 6,
+            y = max(baseline_trend),
+            text = "MACRS Credit Ends",
+            showarrow = False,
+            bgcolor = "white",
+            font = dict(color = "black", size = 11)
+            )
 
     for yr in years:
         fig.add_vline(
