@@ -497,7 +497,7 @@ if uploaded_file is not None:
         else:
             fig.add_annotation(
                 x = 6,
-                y = max(baseline_trend_pv),
+                y = max(baseline_trend),
                 text = "MACRS Credit Ends",
                 showarrow = False,
                 bgcolor = "white",
