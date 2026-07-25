@@ -381,8 +381,13 @@ if uploaded_file is not None:
         ["Free Cash Flow","Raw Spending"], 
         label_visibility = "collapsed"
         )
+    if free_cash_flow:
+        if free_cash_flow == "Free Cash Flow":
+            cash_flow = 1
+        elif free_cash_flow == "Raw Spending":
+            cash_flow = 0
     
-    if use_pv and free_cash_flow:
+    if use_pv and cash_flow == 1:
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_raw_trend_pv, tracker_raw_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
@@ -390,7 +395,7 @@ if uploaded_file is not None:
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
-    elif free_cash_flow:
+    elif cash_flow == 1:
         chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_raw_trend, tracker_raw_trend
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
