@@ -453,7 +453,17 @@ if uploaded_file is not None:
             line_color = "#5DA9E9",
             line_width = 1,
         )
-        fig.add_annotation(
+        if use_pv:
+            fig.add_annotation(
+                x = break_even_f,
+                y = max(baseline_trend_pv) * 0.85,
+                text = f"Fixed Break-Even Year: {break_even_f}",
+                showarrow = False,
+                bgcolor = "white",
+                font = dict(color = "black", size = 11)
+            )
+        else:
+            fig.add_annotation(
             x = break_even_f,
             y = max(baseline_trend) * 0.85,
             text = f"Fixed Break-Even Year: {break_even_f}",
@@ -461,6 +471,7 @@ if uploaded_file is not None:
             bgcolor = "white",
             font = dict(color = "black", size = 11)
         )
+        
 
     if break_even_t is not None:
         fig.add_vline(
@@ -469,14 +480,24 @@ if uploaded_file is not None:
             line_color = "#003F91",
             line_width = 1
         )
-        fig.add_annotation(
+        if use_pv:
+            fig.add_annotation(
+                x = break_even_t,
+                y = max(baseline_trend_pv) * 0.925,
+                text = f"Tracker Break-Even Year: {break_even_t}",
+                showarrow = False,
+                bgcolor = "white",
+                font = dict(color = "black", size = 11)
+        )
+        else:
+            fig.add_annotation(
             x = break_even_t,
             y = max(baseline_trend) * 0.925,
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
             bgcolor = "white",
             font = dict(color = "black", size = 11)
-        )
+            )
     
     if free_cash_flow == "Free Cash Flow":
         fig.add_vline(
