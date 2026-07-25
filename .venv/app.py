@@ -16,7 +16,7 @@ om_esc = 0.04
 total_yrs = 20
 years = list(range(1,total_yrs + 1))
 macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
-base_panel = 1.10
+#base_panel = 1.10
 machinery_cost = 6500.00
 com_costs = 1507
 excess_credit_rate = 0.85
@@ -88,8 +88,8 @@ else:
     st.sidebar.write("Payment added to upfront costs.")
  
 #gross cost baseline
-fixed_gross_per_w = 1.54
-tracker_gross_per_w = 2.50
+#fixed_gross_per_w = 1.54
+#tracker_gross_per_w = 2.50
 
 #csv file from user
 uploaded_file = st.file_uploader("Please upload a CSV file of your Green Button Data:", type=["csv"])
@@ -206,7 +206,7 @@ if uploaded_file is not None:
 
     #fixed calculations
     fixed_yearly = target_cap_kw * 1350
-    pv_modules_f = num_modules_f * base_panel * 435
+    pv_modules_f = num_modules_f * ppw * 435
     inverter_f = inverter_rate * (435 * num_modules_f)
     electrical_bos_cost = elecbos_w * (435 * num_modules_f)
     labor_cost = labor_rate * labor_hours
@@ -225,7 +225,7 @@ if uploaded_file is not None:
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
-    pv_modules_t = num_modules_t * base_panel
+    pv_modules_t = num_modules_t * ppw
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
     struc_t = 15360
@@ -296,9 +296,7 @@ if uploaded_file is not None:
         baseline_trend_pv.append(cash_flow_base_pv)
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
-        st.write(f_macrs_cred)
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
-        st.write(t_macrs_cred)
 
         #fixed
         fixed_gen = system_size_f * fixed_sp_yield * panel_eff
