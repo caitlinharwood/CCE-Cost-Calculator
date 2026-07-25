@@ -356,7 +356,7 @@ if uploaded_file is not None:
     st.segmented_control(
         "Displayed values",
         ["one","two"], 
-        label_visibilty = "collapsed"
+        label_visibility = "collapsed"
         )
     st.segmented_control(
         "Displayed values", 
