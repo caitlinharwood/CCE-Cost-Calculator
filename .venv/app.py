@@ -247,11 +247,18 @@ if uploaded_file is not None:
         cf_fixed_pv = 0.0
         cf_tracker_pv = 0.0
         cf_fixed_raw = 0.0
+        cf_tracker_raw = 0.0
+        cf_fixed_raw_pv = 0.0
+        cf_tracker_raw_pv = 0.0
     else:
         cf_fixed = fixed_upfront
         cf_tracker = tracker_upfront
         cf_fixed_pv = fixed_upfront
         cf_tracker_pv = tracker_upfront
+        cf_fixed_raw = fixed_upfront
+        cf_tracker_raw = tracker_upfront
+        cf_fixed_raw_pv = fixed_upfront
+        cf_tracker_raw_pv = tracker_upfront
 
     cash_flow_base = 0.0
     cash_flow_base_pv = 0.0
