@@ -88,10 +88,6 @@ if loan:
 else:
     st.sidebar.write("Payment added to upfront costs.")
  
-#gross cost baseline
-#fixed_gross_per_w = 1.54
-#tracker_gross_per_w = 2.50
-
 #csv file from user
 uploaded_file = st.file_uploader("Please upload a CSV file of your Green Button Data:", type=["csv"])
 
@@ -561,3 +557,4 @@ if uploaded_file is not None:
 
 #else:
 #    st.write("Please upload a CSV file of your Green Button Data.")
+st.write(max(baseline_trend))
