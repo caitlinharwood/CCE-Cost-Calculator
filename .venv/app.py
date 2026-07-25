@@ -559,5 +559,5 @@ if uploaded_file is not None:
     )
     st.plotly_chart(fig_bar, use_container_width = True)
 
-else:
-    st.write("Please upload a CSV file of your Green Button Data.")
+#else:
+#    st.write("Please upload a CSV file of your Green Button Data.")
