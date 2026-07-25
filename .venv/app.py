@@ -72,7 +72,7 @@ used_area = roof_size * roof_dec
 system_size_f = used_area / 15            #capacity in kW
 
 if roof_size:
-    num_trackers_rec = max(1, round(system_size_f / tracker_kw)) - 15
+    num_trackers_rec = max(1, round(system_size_f / tracker_kw))
 else:
     num_trackers_rec = 10
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 25, num_trackers_rec)
@@ -358,9 +358,9 @@ if uploaded_file is not None:
 
         #raw
         cf_tracker_raw += tracker_out_of_pocket
-        tracker_raw_trend.append(cf_tracker)
+        tracker_raw_trend.append(cf_tracker_raw)
         cf_tracker_raw_pv += tracker_out_of_pocket * disc_factor
-        tracker_raw_trend_pv.append(cf_tracker_pv)
+        tracker_raw_trend_pv.append(cf_tracker_raw_pv)
 
         #fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
@@ -387,15 +387,15 @@ if uploaded_file is not None:
         elif free_cash_flow == "Raw Spending":
             cash_flow = 0
     
-    if use_pv and free_cash_flow == "Free Cash Flow":
+    if use_pv and free_cash_flow == "Raw Spending":
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_raw_trend_pv, tracker_raw_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
-    elif use_pv and free_cash_flow == "Raw Spending":
+    elif use_pv and free_cash_flow == "Free Cash Flow":
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
-    elif free_cash_flow == "Free Cash Flow":
+    elif free_cash_flow == "Raw Spending":
         chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_raw_trend, tracker_raw_trend
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
