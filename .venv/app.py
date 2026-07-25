@@ -51,7 +51,7 @@ rate_mapping = {
     "SDG&E TOU-A2": [0.64136, 0.34408, 0.27545, 0.36934, 0.2903, 0.26697],
     "SDG&E TOU-A3": [0.57911, 0.44639, 0.32795, 0.42062, 0.34158, 0.31825]
 }
-
+ppw = st.sidebar_slider("Price per Watt ($):",0,4.00,2.25)
 #summer: june 1 - oct 31
 #winter: nov 1 - may 31
 
@@ -132,6 +132,10 @@ if uploaded_file is not None:
     baseline_trend_pv = []
     fixed_trend_pv = []
     tracker_trend_pv = []
+    fixed_raw_trend = []
+    fixed_raw_trend_pv = []
+    tracker_raw_trend = []
+    tracker_raw_trend_pv = []
 
     #cf_tracker_pv = tracker_net_inv
     
@@ -299,15 +303,23 @@ if uploaded_file is not None:
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
-        
+        fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
+
         if not loan and yr_num == 1:
             fixed_out_of_pocket += fixed_upfront
+            fixed_out_of_pocket_raw += fixed_upfront
 
         #net fixed
         cf_fixed += fixed_out_of_pocket
         fixed_trend.append(cf_fixed)
         cf_fixed_pv += fixed_out_of_pocket * disc_factor
         fixed_trend_pv.append(cf_fixed_pv)
+
+        #raw
+        cf_fixed_raw += fixed_out_of_pocket_raw
+        fixed_raw_trend.append(cf_fixed_raw)
+        cf_fixed_raw_pv += fixed_out_of_pocket_raw * disc_factor
+        fixed_raw_trend_pv.append(cf_fixed_raw_pv)
         
         #tracker
         tracker_gen = system_size_t * tracker_sp_yield * panel_eff
@@ -324,14 +336,23 @@ if uploaded_file is not None:
         
         #net tracker
         tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly_opex + current_loan_t
+        tracker_out_of_pocket_raw = tracker_remaining + tracker_om + tracker_yearly_opex + current_loan_t
         
         if not loan and yr_num == 1:
             tracker_out_of_pocket += tracker_upfront
+            tracker_out_of_pocket_raw += tracker_upfront
 
+        #net
         cf_tracker += tracker_out_of_pocket
         tracker_trend.append(cf_tracker)
         cf_tracker_pv += tracker_out_of_pocket * disc_factor
         tracker_trend_pv.append(cf_tracker_pv)
+
+        #raw
+        cf_tracker_raw += tracker_out_of_pocket
+        tracker_raw_trend.append(cf_tracker)
+        cf_tracker_raw_pv += tracker_out_of_pocket * disc_factor
+        tracker_raw_trend_pv.append(cf_tracker_pv)
 
         #fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
         #tracker_ann_savings.append(tracker_offset - tracker_om + t_macrs_cred)
@@ -347,30 +368,37 @@ if uploaded_file is not None:
         value = True,
     )
 
-    free_cash = st.radio(
-        "Choose",
-        ["on","off"],
-        horizontal = True
-        )
-
-    st.segmented_control(
+    free_cash_flow = st.segmented_control(
         "Displayed values",
-        ["one","two"], 
+        ["Free Cash Flow","Raw Spending"], 
         label_visibility = "collapsed"
         )
-    st.segmented_control(
-        "Displayed values", 
-        ["Normalized", "Absolute"], 
-        label_visibility="collapsed")
     
-    if use_pv:
+    if use_pv and free_cash_flow:
+        chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_raw_trend_pv, tracker_raw_trend_pv
+        y_axis_title = "Present Value of Cumulative Spending ($)"
+        chart_title = "20-Year Cumulative Spending (Present Value)"
+    elif use_pv:
         chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
-    else:
+    elif free_cash_flow:
+        chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_raw_trend, tracker_raw_trend
+        y_axis_title = "Present Value of Cumulative Spending ($)"
+        chart_title = "20-Year Cumulative Spending (Present Value)"
+    else:    
         chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_trend, tracker_trend
-        y_axis_title = "Cumulative Spending ($)"
-        chart_title = "20-Year Cumulative Spending"
+        y_axis_title = "Present Value of Cumulative Spending ($)"
+        chart_title = "20-Year Cumulative Spending (Present Value)"
+
+    #if use_pv:
+     #   chart_baseline, chart_fixed, chart_tracker = baseline_trend_pv, fixed_trend_pv, tracker_trend_pv
+      #  y_axis_title = "Present Value of Cumulative Spending ($)"
+       # chart_title = "20-Year Cumulative Spending (Present Value)"
+    #else:
+     #   chart_baseline, chart_fixed, chart_tracker = baseline_trend, fixed_trend, tracker_trend
+      ## chart_title = "20-Year Cumulative Spending"
+    
     #line graphs
     chart_data = pd.DataFrame({
         "Year": years,
