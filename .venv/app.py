@@ -357,9 +357,9 @@ if uploaded_file is not None:
         tracker_trend_pv.append(cf_tracker_pv)
 
         #raw
-        cf_tracker_raw += tracker_out_of_pocket
+        cf_tracker_raw += tracker_out_of_pocket_raw
         tracker_raw_trend.append(cf_tracker_raw)
-        cf_tracker_raw_pv += tracker_out_of_pocket * disc_factor
+        cf_tracker_raw_pv += tracker_out_of_pocket_raw * disc_factor
         tracker_raw_trend_pv.append(cf_tracker_raw_pv)
 
         #fixed_ann_savings.append(current_spending - yearly_payment_f - fixed_om + fixed_yearly_opex)
