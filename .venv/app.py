@@ -27,7 +27,7 @@ elecbos_w = 0.18
 labor_rate = 85
 labor_hours = 1595.06
 acc_cost = 0.02
-strucural = 48115
+structural = 48115
 mod_per_tracker = 90
 complexity = 1.08
 
@@ -52,12 +52,6 @@ rate_mapping = {
     "SDG&E TOU-A3": [0.57911, 0.44639, 0.32795, 0.42062, 0.34158, 0.31825]
 }
 ppw = st.sidebar.slider("Price per Watt ($):",0.0,4.00,2.25)
-#summer: june 1 - oct 31
-#winter: nov 1 - may 31
-
-#peak: 4pm - 9pm
-#off-peak: 6am - 10am, 2pm - 4pm, 9pm - 12am
-#super off-peak: 12am - 6am, 10am - 2pm
 
 elec_current = rate_mapping[sdge_rate]
 
@@ -134,9 +128,6 @@ if uploaded_file is not None:
     tracker_raw_trend = []
     tracker_raw_trend_pv = []
 
-    #cf_tracker_pv = tracker_net_inv
-    
-    ######
     raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
 
     df['usage_parsed'] = pd.to_numeric(df[target_column], errors='coerce')
@@ -222,7 +213,7 @@ if uploaded_file is not None:
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
-    pv_modules_t = num_modules_t * ppw
+    pv_modules_t = num_modules_t * ppw * 435
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
     struc_t = 15360
@@ -483,7 +474,7 @@ if uploaded_file is not None:
         if use_pv:
             fig.add_annotation(
                 x = break_even_t,
-                y = max(baseline_trend_pv) * 0.925,
+                y = max(baseline_trend_pv) * 0.925 if uploaded_file is not None else 1000000,
                 text = f"Tracker Break-Even Year: {break_even_t}",
                 showarrow = False,
                 bgcolor = "white",
@@ -492,7 +483,7 @@ if uploaded_file is not None:
         else:
             fig.add_annotation(
             x = break_even_t,
-            y = max(baseline_trend) * 0.925,
+            y = max(baseline_trend) * 0.925 if uploaded_file is not None else 1000000,
             text = f"Tracker Break-Even Year: {break_even_t}",
             showarrow = False,
             bgcolor = "white",
@@ -509,7 +500,7 @@ if uploaded_file is not None:
         if use_pv:
             fig.add_annotation(
                 x = 6,
-                y = max(baseline_trend_pv),
+                y = max(baseline_trend_pv) if uploaded_file is not None else 1000000,
                 text = "MACRS Credit Ends",
                 showarrow = False,
                 bgcolor = "white",
@@ -585,7 +576,3 @@ if uploaded_file is not None:
         yaxis = dict(title = "Savings ($ / Year)")
     )
     st.plotly_chart(fig_bar, use_container_width = True)
-
-#else:
-#    st.write("Please upload a CSV file of your Green Button Data.")
-st.write(max(baseline_trend))
