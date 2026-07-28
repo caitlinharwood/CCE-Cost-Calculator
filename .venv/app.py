@@ -213,6 +213,8 @@ if uploaded_file is not None:
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
+    st.sidebar.write("-90 modules per tracker")
+    st.sidebar.write("-435W per module")
     pv_modules_t = num_modules_t * ppw * 435
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
@@ -576,3 +578,4 @@ if uploaded_file is not None:
         yaxis = dict(title = "Savings ($ / Year)")
     )
     st.plotly_chart(fig_bar, use_container_width = True)
+    st.link_button("Paper on installing solar arrays to existing parking structures: ", "https://centerforcommunityenergy.org/wp-content/uploads/2024/10/Installing-Solar-Arrays-on-Existing-Parking-Structures-in-California.pdf")
