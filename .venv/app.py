@@ -179,8 +179,7 @@ if uploaded_file is not None:
     base_yr_spend = df_clean['initial_row_cost'].sum()
                                                                           
     eff_rate_blend = df_clean['elec_current_val'].mean() if len(df_clean) > 0 else np.nan
-    st.write("rate blend")
-    st.write(eff_rate_blend)
+    
     #summer: june 1 - oct 31
     #winter: nov 1 - may 31
 
@@ -333,10 +332,9 @@ if uploaded_file is not None:
         
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
-        st.write(i,fixed_omf)
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
-        #st.write(fixed_cash_flow)
+        st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
