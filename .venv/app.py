@@ -272,7 +272,6 @@ if uploaded_file is not None:
     #from excel sheet
     total_sys_cost = system_size * 1000 * ppw
     dep_basis = total_sys_cost * 0.75
-    st.write(dep_basis)
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
 
@@ -302,6 +301,8 @@ if uploaded_file is not None:
         baseline_trend_pv.append(cash_flow_base_pv)
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
+        st.write(dep_basis)
+        st.write(f_macrs_cred)
         f_macrs_ben = dep_basis * f_macrs_cred * 0.3 #excel, co tax r
         st.write(f_macrs_ben)
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
