@@ -213,8 +213,8 @@ if uploaded_file is not None:
     num_modules_t = (total_baseline_kwh / (0.435 * 2360))
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
-    st.sidebar.write("-90 modules per tracker")
-    st.sidebar.write("-435W per module")
+    #st.sidebar.write("-90 modules per tracker")
+    st.sidebar.write("-435W per panel")
     pv_modules_t = num_modules_t * ppw * 435
     inverter_t = inverter_rate * target_sys_t * 1000
     mounting = 233600
