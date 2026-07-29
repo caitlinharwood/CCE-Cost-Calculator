@@ -301,6 +301,7 @@ if uploaded_file is not None:
         baseline_trend_pv.append(cash_flow_base_pv)
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
+        st.write(f_macrs_cred)
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
 
         #fixed
