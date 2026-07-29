@@ -310,9 +310,7 @@ if uploaded_file is not None:
         #f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
         
         f_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
-        st.write("rate",i,macrs_rates[i])
-        st.write("f cred",i,f_macrs_cred)
-
+        
         #t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
         t_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(tracker_mac) else 0
 
@@ -337,9 +335,7 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
-        st.write("egenf",i,egenf)
-        st.write("f_macrs_cred",f_macrs_cred)
-        st.write("omf",fixed_omf)
+        
         st.write(i,fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
