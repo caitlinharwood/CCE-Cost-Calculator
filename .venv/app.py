@@ -270,7 +270,7 @@ if uploaded_file is not None:
 
 
     #from excel sheet
-    total_sys_cost = system_size * ppw
+    total_sys_cost = system_size * 1000 * ppw
     dep_basis = total_sys_cost * 0.75
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
