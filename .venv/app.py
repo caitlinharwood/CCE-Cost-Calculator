@@ -284,6 +284,7 @@ if uploaded_file is not None:
         #rising rates
         #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
         utility_escalation_factor = 1 + (elec_increase * (i - 1))
+        st.write(elec_increase)
         st.write(utility_escalation_factor)
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         panel_eff = (1 - degrad) ** i
