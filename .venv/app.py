@@ -292,6 +292,7 @@ if uploaded_file is not None:
         panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
+        st.write(egenf)
         #eff_utility_rate[0.141]
 
 
@@ -305,7 +306,6 @@ if uploaded_file is not None:
         #f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
         
         f_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
-        st.write(f_macrs_cred)
         #t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
         t_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(tracker_mac) else 0
 
@@ -326,7 +326,7 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
-        st.write(fixed_cash_flow)
+        #st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
