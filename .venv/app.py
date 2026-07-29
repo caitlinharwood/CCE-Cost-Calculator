@@ -322,7 +322,7 @@ if uploaded_file is not None:
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
-        fixed_cash_flow = egenf + f_macrs_ben - fixed_omf
+        #fixed_cash_flow = egenf + f_macrs_ben - fixed_omf
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
