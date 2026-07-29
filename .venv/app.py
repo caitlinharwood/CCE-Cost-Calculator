@@ -287,16 +287,16 @@ if uploaded_file is not None:
 
         #rising rates
         #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
-        utility_escalation_factor = 1 + (elec_increase * (i - 1))       #from excel
+        utility_escalation_factor = 1 + (elec_increase * (i))       #from excel
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         #panel_eff = (1 - degrad) ** i
-        panel_eff = 1 - (degrad * (i - 1))
+        panel_eff = 1 - (degrad * (i))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
         egenf = .133 * 602600 * utility_escalation_factor * panel_eff
-        st.write("ut esc", utility_escalation_factor)
-        st.write("panel", panel_eff)
-        st.write("egenf",egenf)
+        st.write("ut esc", utility_escalation_factor, i)
+        st.write("panel", panel_eff, i)
+        st.write("egenf",egenf, i)
         #eff_utility_rate[0.141]
 
 
