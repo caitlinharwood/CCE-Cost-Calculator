@@ -326,10 +326,14 @@ if uploaded_file is not None:
         fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         #fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        fixed_om = 1 + (om_esc * (i - 1))       #excel
-        st.write(i, fixed_om)
+        if i == 0:
+            fixed_om = 0
+        else:
+            fixed_om = 1 + (om_esc * (i - 1))       #excel
+        
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
+        st.write(i,fixed_omf)
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
         #st.write(fixed_cash_flow)
