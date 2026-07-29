@@ -179,7 +179,8 @@ if uploaded_file is not None:
     base_yr_spend = df_clean['initial_row_cost'].sum()
                                                                           
     eff_rate_blend = df_clean['elec_current_val'].mean() if len(df_clean) > 0 else np.nan
-    
+    st.write("rate blend")
+    st.write(eff_rate_blend)
     #summer: june 1 - oct 31
     #winter: nov 1 - may 31
 
@@ -291,9 +292,11 @@ if uploaded_file is not None:
         #panel_eff = (1 - degrad) ** i
         panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
-        egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
-        st.write(total_baseline_kwh)
-        st.write(egenf)
+        #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
+        st.write("base kwh",total_baseline_kwh)
+        egenf = eff_rate_blend * 602600 * 1.08 * .995
+        
+        st.write("egenf",egenf)
         #eff_utility_rate[0.141]
 
 
