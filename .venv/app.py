@@ -12,7 +12,7 @@ tracker_kw = 42.84
 itc_rate = 0.30
 degrad = 0.005
 om_per_kw = 20.0     
-om_esc = 0.04
+om_esc = 0.03
 total_yrs = 20
 years = list(range(1,total_yrs + 1))
 macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
@@ -71,7 +71,8 @@ else:
     num_trackers_rec = 10
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 25, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
-system_size = system_size_f
+#system_size = system_size_f
+system_size = 428.4 #kW
 
 loan = st.sidebar.checkbox("Payment Over Time with Loan?")
 if loan:
@@ -283,12 +284,14 @@ if uploaded_file is not None:
 
         #rising rates
         #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
-        utility_escalation_factor = 1 + (elec_increase * (i - 1))
-        st.write(elec_increase)
-        st.write(utility_escalation_factor)
+        utility_escalation_factor = 1 + (elec_increase * (i - 1))       #from excel
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
-        panel_eff = (1 - degrad) ** i
+        #panel_eff = (1 - degrad) ** i
+        panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
+        egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
+        #eff_utility_rate[0.141]
+
 
         #current baseline
         current_spending = base_yr_spend * utility_escalation_factor
@@ -311,8 +314,13 @@ if uploaded_file is not None:
 
         fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
-        fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
+        #fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
+        fixed_om = 1 + (om_esc * (i - 1))       #excel
+        om_base = 12.5 #$/kWh-yr
+        fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
+        fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
+        st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
