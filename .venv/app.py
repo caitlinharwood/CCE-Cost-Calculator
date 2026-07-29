@@ -293,10 +293,8 @@ if uploaded_file is not None:
         panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
-        egenf = .133 * 602600 * utility_escalation_factor * panel_eff
-        st.write("ut esc", utility_escalation_factor, i)
-        st.write("panel", panel_eff, i)
-        st.write("egenf",egenf, i)
+        egenf = .141 * 602600 * utility_escalation_factor * panel_eff
+        st.write("egenf",i, egenf)
         #eff_utility_rate[0.141]
 
 
