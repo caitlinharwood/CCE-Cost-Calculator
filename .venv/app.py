@@ -293,8 +293,11 @@ if uploaded_file is not None:
         panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
-        egenf = .141 * 602600 * utility_escalation_factor * panel_eff
-        st.write("egenf",i, egenf)
+        if i == 0:
+            egenf = 0
+        else:
+            egenf = .141 * 602600 * utility_escalation_factor * panel_eff
+
         #eff_utility_rate[0.141]
 
 
@@ -324,6 +327,7 @@ if uploaded_file is not None:
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         #fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
         fixed_om = 1 + (om_esc * (i - 1))       #excel
+        st.write(i, fixed_om)
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
