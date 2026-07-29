@@ -205,7 +205,7 @@ if uploaded_file is not None:
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
-
+    #fixed_mac = 
     #tracker calculations
     #tracker_yearly = target_cap_kw * (1350 * 1.25)
     kw_dc = 435 * complexity
@@ -300,10 +300,10 @@ if uploaded_file is not None:
         baseline_trend.append(cash_flow_base)
         baseline_trend_pv.append(cash_flow_base_pv)
         
-        f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
+        #f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
+        
+        f_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
         st.write(f_macrs_cred)
-        f_macrs_ben = dep_basis * f_macrs_cred * 0.3 #excel, co tax r
-        #st.write(f_macrs_ben)
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
 
         #fixed
