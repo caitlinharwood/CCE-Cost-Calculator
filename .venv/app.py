@@ -13,7 +13,7 @@ itc_rate = 0.30
 degrad = 0.005
 om_per_kw = 20.0     
 om_esc = 0.03
-total_yrs = 20
+total_yrs = 21
 years = list(range(1,total_yrs + 1))
 macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
 machinery_cost = 6500.00
@@ -287,10 +287,10 @@ if uploaded_file is not None:
 
         #rising rates
         #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
-        utility_escalation_factor = 1 + (elec_increase * (i))       #from excel
+        utility_escalation_factor = 1 + (elec_increase * (i - 1))       #from excel
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         #panel_eff = (1 - degrad) ** i
-        panel_eff = 1 - (degrad * (i))
+        panel_eff = 1 - (degrad * (i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
         egenf = .133 * 602600 * utility_escalation_factor * panel_eff
