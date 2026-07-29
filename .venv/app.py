@@ -206,6 +206,8 @@ if uploaded_file is not None:
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
     #fixed_mac = 
+
+
     #tracker calculations
     #tracker_yearly = target_cap_kw * (1350 * 1.25)
     kw_dc = 435 * complexity
@@ -304,7 +306,8 @@ if uploaded_file is not None:
         
         f_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
         st.write(f_macrs_cred)
-        t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
+        #t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
+        t_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(tracker_mac) else 0
 
         #fixed
         fixed_gen = system_size_f * fixed_sp_yield * panel_eff
@@ -322,7 +325,8 @@ if uploaded_file is not None:
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
-        #fixed_cash_flow = egenf + f_macrs_ben - fixed_omf
+        fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
+        st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
