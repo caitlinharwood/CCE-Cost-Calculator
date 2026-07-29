@@ -16,7 +16,6 @@ om_esc = 0.04
 total_yrs = 20
 years = list(range(1,total_yrs + 1))
 macrs_rates = [0.20, 0.32, 0.192, 0.1152, 0.1152, 0.0576]
-#base_panel = 1.10
 machinery_cost = 6500.00
 com_costs = 1507
 excess_credit_rate = 0.85
@@ -268,6 +267,14 @@ if uploaded_file is not None:
         yearly_payment_f = 0.0
         yearly_payment_t = 0.0
 
+
+    #from excel sheet
+    total_sys_cost = system_size * ppw
+    dep_basis = total_sys_cost * 0.75
+    uer = 0.08      #low
+    #uef = 1 + (uer * (t - 1))) 
+
+
     for i in range(total_yrs):
         yr_num = i + 1
 
@@ -276,6 +283,7 @@ if uploaded_file is not None:
 
         #rising rates
         utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
+        st.write(utility_escalation_factor)
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         panel_eff = (1 - degrad) ** i
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
