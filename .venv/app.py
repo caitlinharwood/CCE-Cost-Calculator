@@ -272,6 +272,7 @@ if uploaded_file is not None:
     #from excel sheet
     total_sys_cost = system_size * 1000 * ppw
     dep_basis = total_sys_cost * 0.75
+    st.write(dep_basis)
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
 
@@ -321,7 +322,6 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_ben - fixed_omf
-        st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
