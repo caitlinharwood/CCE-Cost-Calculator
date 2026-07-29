@@ -303,6 +303,7 @@ if uploaded_file is not None:
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
         f_macrs_ben = dep_basis * f_macrs_cred * 0.3 #excel, co tax r
+        st.write(f_macrs_ben)
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
 
         #fixed
