@@ -282,7 +282,8 @@ if uploaded_file is not None:
         current_loan_t = yearly_payment_t if (loan and yr_num <= loan_length) else 0.0
 
         #rising rates
-        utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
+        #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
+        utility_escalation_factor = 1 + (elec_increase * (i - 1))
         st.write(utility_escalation_factor)
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
         panel_eff = (1 - degrad) ** i
