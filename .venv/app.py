@@ -578,6 +578,6 @@ if uploaded_file is not None:
         yaxis = dict(title = "Savings ($ / Year)")
     )
     st.plotly_chart(fig_bar, use_container_width = True)
-    st.markdown("The purpose of this tool is to provide a visual demonstration of the savings available by implementing fixed or tracking solar arrays to existing parking structures. For more information, please visit [centerforcommunityenergy.org/](centerforcommunityenergy.org/).")
+    st.markdown("The purpose of this tool is to provide a visual demonstration of the savings available by implementing fixed or tracking solar arrays to existing parking structures. For more information, please visit [centerforcommunityenergy.org/](https://centerforcommunityenergy.org/).")
     st.link_button("Paper on installing solar arrays to existing parking structures, by CCE intern Grace Liu", "https://centerforcommunityenergy.org/wp-content/uploads/2024/10/Installing-Solar-Arrays-on-Existing-Parking-Structures-in-California.pdf")
     st.write("No information provided is collected or saved.")
