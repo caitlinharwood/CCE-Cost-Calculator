@@ -301,7 +301,7 @@ if uploaded_file is not None:
         baseline_trend_pv.append(cash_flow_base_pv)
         
         f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
-        st.write(f_macrs_cred)
+        f_macrs_ben = dep_basis * f_macrs_cred * 0.3 #excel, co tax r
         t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
 
         #fixed
@@ -320,7 +320,7 @@ if uploaded_file is not None:
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
-        fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
+        fixed_cash_flow = egenf + f_macrs_ben - fixed_omf
         st.write(fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
