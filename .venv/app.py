@@ -340,8 +340,11 @@ if uploaded_file is not None:
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
+        fixed_upfront_2 = (-1) * total_sys_cost * 0.5
+        st.write(fixed_upfront_2)
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
         #st.write("egenf",i,egenf)
+
         st.write(i,fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
