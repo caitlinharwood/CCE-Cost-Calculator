@@ -201,6 +201,7 @@ if uploaded_file is not None:
     acc_total = acc_cost * (435 * num_modules_f)
     
     fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
+    st.write(fixed_upfront)
     fixed_cap = fixed_upfront
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
@@ -341,7 +342,6 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost * 0.5
-        st.write(fixed_upfront_2)
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
         #st.write("egenf",i,egenf)
 
