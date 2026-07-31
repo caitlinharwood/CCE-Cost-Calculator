@@ -298,7 +298,7 @@ if uploaded_file is not None:
             egenf = .141 * total_baseline_kwh * utility_escalation_factor * panel_eff
 
 
-        if i == 12:
+        if i == 20:
             st.write("kwh",total_baseline_kwh)
             st.write("uef",utility_escalation_factor)
             st.write("panel eff",panel_eff)
