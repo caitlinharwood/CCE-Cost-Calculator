@@ -295,7 +295,7 @@ if uploaded_file is not None:
         if i == 0:
             egenf = 0
         else:
-            egenf = .141 * 602600 * utility_escalation_factor * panel_eff
+            egenf = .141 * total_baseline_kwh * utility_escalation_factor * panel_eff
 
         #eff_utility_rate[0.141]
 
@@ -336,7 +336,6 @@ if uploaded_file is not None:
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
         st.write("egenf",i,egenf)
-        st.write("omf",i,fixed_omf)
         st.write(i,fixed_cash_flow)
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
