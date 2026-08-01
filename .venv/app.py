@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import numpy_financial as npf
 import math
 
 st.title("CCE Cost Calculator")
@@ -66,12 +67,11 @@ system_size_f = used_area / 15            #capacity in kW
 
 if roof_size:
     num_trackers_rec = max(1, round(system_size_f / 150))
-    #num_trackers_rec = max(1, round(system_size_f / tracker_kw))
 else:
     num_trackers_rec = 10
+
 num_trackers = st.sidebar.slider("Number of trackers:", 1, 25, num_trackers_rec)
 system_size_t = num_trackers * tracker_kw
-#system_size = system_size_f
 system_size = 428.4 #kW
 
 loan = st.sidebar.checkbox("Payment Over Time with Loan?")
@@ -91,20 +91,25 @@ if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
     all_columns = [str(col).strip() for col in df.columns]
+
     col_index = 0
     for i, col in enumerate(all_columns):
         col_lower = col.lower()
-        if 'usage' in col_lower or 'kwh' in col_lower or 'net' in col_lower or 'value' in col_lower:
+        if any(key in col_lower for key in ['usage','kwh','net','value']):
             col_index = i
             break
+
+        #if 'usage' in col_lower or 'kwh' in col_lower or 'net' in col_lower or 'value' in col_lower:
+        #    col_index = i
+        #    break
     target_column = st.selectbox(
         "Column containing electricty consumption data:",
         options = all_columns,
         index = col_index
     )
-
+    col_index_date = 0
     for i, col in enumerate(all_columns):
-        col_lower = col.lower()
+        #col_lower = col.lower()
         if 'start' in col_lower:
             col_index = i
             break
@@ -117,32 +122,20 @@ if uploaded_file is not None:
     #elec_current = float(elec_current_input)
     fixed_sp_yield = 1450
     tracker_sp_yield = 1900
-    baseline_trend = []
-    fixed_trend = []
-    tracker_trend = []
-    baseline_trend_pv = []
-    fixed_trend_pv = []
-    tracker_trend_pv = []
-    fixed_raw_trend = []
-    fixed_raw_trend_pv = []
-    tracker_raw_trend = []
-    tracker_raw_trend_pv = []
-
-    raw_usage = pd.to_numeric(df[target_column], errors = 'coerce').dropna()
+    baseline_trend, fixed_trend, tracker_trend = [],[],[]
+    baseline_trend_pv,fixed_trend_pv,tracker_trend_pv = [],[],[]
+    fixed_raw_trend,fixed_raw_trend_pv = [],[]
+    tracker_raw_trend,tracker_raw_trend_pv = [],[]
 
     df['usage_parsed'] = pd.to_numeric(df[target_column], errors='coerce')
     df_clean = df.dropna(subset=['usage_parsed', target_column_date]).copy()
 
     #15 min or hourly intervals
     if len(df_clean) > 15000:
-        # usage= raw_usage.head(35040)
         df_clean = df_clean.head(35040)
         df_clean['usage_hourly_eq'] = df_clean['usage_parsed'] / 4.0
-        #total_baseline_kwh = usage.sum() / 4.0
 
     else:
-        #usage = raw_usage.head(8760)
-        #total_baseline_kwh = usage.sum()
         df_clean = df_clean.head(8760)
         df_clean['usage_hourly_eq'] = df_clean['usage_parsed']
 
@@ -180,12 +173,6 @@ if uploaded_file is not None:
                                                                           
     eff_rate_blend = df_clean['elec_current_val'].mean() if len(df_clean) > 0 else np.nan
     
-    #summer: june 1 - oct 31
-    #winter: nov 1 - may 31
-
-    #peak: 4pm - 9pm
-    #off-peak: 6am - 10am, 2pm - 4pm, 9pm - 12am
-    #super off-peak: 12am - 6am, 10am - 2pm
     system_size_f = (num_modules_f * 435) / 1000
     target_cap_kw = num_trackers * tracker_kw
 
@@ -193,7 +180,7 @@ if uploaded_file is not None:
     tracker_raw_gen = system_size_t * tracker_sp_yield
 
     #fixed calculations
-    fixed_yearly = target_cap_kw * 1350
+    #fixed_yearly = target_cap_kw * 1350
     pv_modules_f = num_modules_f * ppw * 435
     inverter_f = inverter_rate * (435 * num_modules_f)
     electrical_bos_cost = elecbos_w * (435 * num_modules_f)
@@ -201,19 +188,16 @@ if uploaded_file is not None:
     acc_total = acc_cost * (435 * num_modules_f)
     
     fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
-    st.write(fixed_upfront)
     fixed_cap = fixed_upfront
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
     fixed_mac = [round(fixed_basis * r * fed_tax) for r in macrs_rates]
-    #fixed_mac = 
-
 
     #tracker calculations
     #tracker_yearly = target_cap_kw * (1350 * 1.25)
     kw_dc = 435 * complexity
-    target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker)
-    num_modules_t = (total_baseline_kwh / (0.435 * 2360))
+    target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker) if total_baseline_kwh else 0
+    num_modules_t = (total_baseline_kwh / (0.435 * 2360)) if total_baseline_kwh else 0
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
     #st.sidebar.write("-90 modules per tracker")
@@ -255,10 +239,8 @@ if uploaded_file is not None:
 
     cash_flow_base = 0.0
     cash_flow_base_pv = 0.0
-    fixed_ann_savings = []
-    tracker_ann_savings = []
-    fixed_raw_ann_savings = []
-    tracker_raw_ann_savings = []
+    fixed_ann_savings,tracker_ann_savings = [],[]
+    fixed_raw_ann_savings,tracker_raw_ann_savings = [],[]
 
     if loan and loan_length > 0 and loan_interest > 0:
         yearly_payment_f = fixed_upfront * ((loan_interest * (1 + loan_interest) ** loan_length)) / (((1 + loan_interest) ** loan_length) - 1)
@@ -273,8 +255,12 @@ if uploaded_file is not None:
 
 
     #from excel sheet
-    total_sys_cost = system_size * 1000 * ppw
-    dep_basis = total_sys_cost * 0.75
+    total_sys_cost_f = system_size * 1000 * ppw
+    dep_basis_f = total_sys_cost_f * 0.75
+    om_base_f = 12.5
+    total_sys_cost_t = ppw * system_size * 1000
+    dep_basis_t = total_sys_cost_t * 0.75
+    om_base_t = 30
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
 
@@ -287,10 +273,9 @@ if uploaded_file is not None:
 
         #rising rates
         #utility_escalation_factor = (1 + elec_increase) ** i  #utlity increase
-        utility_escalation_factor = 1 + (elec_increase * (i - 1))       #from excel
+        utility_escalation_factor = 1 if i == 0 else 1 + (elec_increase * (i - 1))       #from excel
         om_escalation_factor = (1 + om_esc) ** i       # 4% O&M Escalation
-        #panel_eff = (1 - degrad) ** i
-        panel_eff = 1 - (degrad * (i - 1))
+        panel_eff = 1 - (degrad * max(0,i - 1))
         disc_factor = 1 / ((1 + disc_rate) ** (i + 1))
         #egenf = eff_rate_blend * (total_baseline_kwh * utility_escalation_factor * panel_eff)
         if i == 0:
@@ -316,36 +301,27 @@ if uploaded_file is not None:
         
         #f_macrs_cred = fixed_mac[i] if i < len(fixed_mac) else 0
         
-        f_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
+        f_macrs_cred = dep_basis_f * 0.3 * macrs_rates[i] if i < len(fixed_mac) else 0
         
         #t_macrs_cred = tracker_mac[i] if i < len(tracker_mac) else 0
-        t_macrs_cred = dep_basis * 0.3 * macrs_rates[i] if i < len(tracker_mac) else 0
+        t_macrs_cred = dep_basis_t * 0.3 * macrs_rates[i] if i < len(tracker_mac) else 0
 
         #fixed
         fixed_gen = system_size_f * fixed_sp_yield * panel_eff
-
-        if fixed_gen <= total_baseline_kwh:
-            fixed_gen_usable = fixed_gen
-        else:
-            excess_f = fixed_gen - total_baseline_kwh
-            fixed_gen_usable = total_baseline_kwh + excess_f * excess_credit_rate
-
+        excess_f = max(0.0,fixed_gen - total_baseline_kwh)
+        fixed_gen_usable = min(fixed_gen,total_baseline_kwh) + (excess_f * excess_credit_rate)
+        
         fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         #fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        if i == 0:
-            fixed_om = 0
-        else:
-            fixed_om = 1 + (om_esc * (i - 1))       #excel
+        fixed_om = 0 if i == 0 else 1 + (om_esc * (i - 1))       #excel
         
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
-        fixed_upfront_2 = (-1) * total_sys_cost * 0.5
+        fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
-        #st.write("egenf",i,egenf)
-
-        st.write(i,fixed_cash_flow)
+        fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
