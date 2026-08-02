@@ -189,7 +189,7 @@ if uploaded_file is not None:
     labor_cost = labor_rate * labor_hours
     acc_total = acc_cost * (435 * num_modules_f)
     
-    fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + labor_cost + acc_total
+    fixed_upfront = pv_modules_f + inverter_f + electrical_bos_cost + (labor_cost/2) + acc_total
     fixed_cap = fixed_upfront
     fixed_itc = fixed_cap * itc_rate
     fixed_basis = fixed_cap - (fixed_itc * 0.5)
@@ -388,14 +388,12 @@ if uploaded_file is not None:
         fixed_raw_ann_savings.append(current_spending - fixed_out_of_pocket_raw)
         tracker_raw_ann_savings.append(current_spending - tracker_out_of_pocket_raw)
 
-
     yr0_outlay = -1 * total_sys_cost_f * 0.5  
     def calc_npv_f(rate,annual_flows,initial_cost=0.0):
         pv_annual = sum(cf / ((1 + rate) ** t) for t, cf in enumerate(annual_flows,start=1))
         return initial_cost + pv_annual
         
     fixed_20yr_npv = calc_npv_f(disc_rate,fixed_cash_flow_list,initial_cost=yr0_outlay)
-    st.write(fixed_20yr_npv)
 
     target_len = len(years)
 
