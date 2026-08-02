@@ -316,7 +316,7 @@ if uploaded_file is not None:
 
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
-        fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
+        fixed_out_of_pocket = fixed_remaining + fixed_omf - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
         fixed_cash_flow = (egenf + f_macrs_cred - fixed_omf)
         
@@ -324,7 +324,7 @@ if uploaded_file is not None:
         f_flow += fixed_cash_flow
         fixed_cash_flow_trend.append(f_flow)
         #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
-        fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
+        fixed_out_of_pocket_raw = fixed_remaining + fixed_omf + fixed_yearly_opex + current_loan_f
         f_flow_raw += fixed_cash_flow
         fixed_raw_trend.append(f_flow_raw)
         yr_pv = fixed_cash_flow / ((1 + disc_rate) ** (i + 1))
