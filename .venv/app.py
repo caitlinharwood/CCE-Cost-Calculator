@@ -361,7 +361,7 @@ if uploaded_file is not None:
         #tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
         tracker_om = 1 + (.03 * (i - 1))
         om_base_t = 30 #$/kWh-yr
-        tracker_omf = om_base_t * system_size_t * tracker_om
+        tracker_omf = om_base * system_size_t * tracker_om
         
         #net tracker
         tracker_out_of_pocket = tracker_remaining + tracker_omf - t_macrs_cred + tracker_yearly_opex + current_loan_t
