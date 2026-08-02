@@ -127,6 +127,7 @@ if uploaded_file is not None:
     fixed_raw_trend,fixed_raw_trend_pv = [],[]
     tracker_raw_trend,tracker_raw_trend_pv = [],[]
     fixed_cash_flow_trend = []
+    fixed_pv_trend = []
 
     df['usage_parsed'] = pd.to_numeric(df[target_column], errors='coerce')
     df_clean = df.dropna(subset=['usage_parsed', target_column_date]).copy()
@@ -220,6 +221,8 @@ if uploaded_file is not None:
     tracker_yearly_opex = system_size_t * 8.0
 
     f_flow = 0.0
+    f_flow_raw = 0.0
+    f_flow_pv = 0.0
 
     if loan:
         cf_fixed = 0.0
@@ -266,7 +269,7 @@ if uploaded_file is not None:
     om_base_t = 30
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
-    fixed_cash_flow = []
+    fixed_cash_flow,fixed_cash_flow_list = [],[]
 
     for i in range(total_yrs):
         yr_num = i + 1
@@ -308,18 +311,25 @@ if uploaded_file is not None:
         fixed_offset = fixed_gen_usable * eff_rate_blend * utility_escalation_factor      #fixed utility savings
         fixed_remaining = max(0.0,current_spending - fixed_offset)
         #fixed_om = (system_size_f * om_per_kw) * om_escalation_factor
-        fixed_om = 0 if i == 0 else 1 + (om_esc * (i - 1))       #excel
-        
+        #fixed_om = 0 if i == 0 else 1 + (om_esc * (i - 1))       #excel
+        fixed_om = (1 + om_esc) ** i
+
         om_base = 12.5 #$/kWh-yr
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
         fixed_cash_flow = (egenf + f_macrs_cred - fixed_omf)
+        
+        fixed_cash_flow_list.append(fixed_cash_flow)
         f_flow += fixed_cash_flow
         fixed_cash_flow_trend.append(f_flow)
-        #st.write(fixed_cash_flow)
         #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
+        f_flow_raw += fixed_cash_flow
+        fixed_raw_trend.append(f_flow_raw)
+        yr_pv = fixed_cash_flow / ((1 + disc_rate) ** (i + 1))
+        f_flow_pv += yr_pv
+        fixed_pv_trend.append(f_flow_pv)
 
         if not loan and yr_num == 1:
             fixed_out_of_pocket += fixed_upfront
@@ -377,12 +387,15 @@ if uploaded_file is not None:
         tracker_ann_savings.append(current_spending - tracker_out_of_pocket)
         fixed_raw_ann_savings.append(current_spending - fixed_out_of_pocket_raw)
         tracker_raw_ann_savings.append(current_spending - tracker_out_of_pocket_raw)
+
+
+    yr0_outlay = -1 * total_sys_cost_f * 0.5  
+    def calc_npv_f(rate,annual_flows,initial_cost=0.0):
+        pv_annual = sum(cf / ((1 + rate) ** t) for t, cf in enumerate(annual_flows,start=1))
+        return initial_cost + pv_annual
         
-    def calc_npv_f(rate,values):
-        return sum(v / ((1 + rate) ** t) for t,v in enumerate(values,start = 1))
-    
-    test = calc_npv_f(disc_factor,fixed_cash_flow_trend)
-    st.write(test)
+    fixed_20yr_npv = calc_npv_f(disc_rate,fixed_cash_flow_list,initial_cost=yr0_outlay)
+    st.write(fixed_20yr_npv)
 
     target_len = len(years)
 
@@ -400,7 +413,7 @@ if uploaded_file is not None:
     
     if use_pv: 
         chart_baseline = baseline_trend_pv
-        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_cash_flow_trend 
+        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_trend_pv 
         chart_tracker = tracker_raw_trend_pv if free_cash_flow == "Raw Spending" else tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
