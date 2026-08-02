@@ -312,6 +312,7 @@ if uploaded_file is not None:
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
         fixed_cash_flow.append(egenf + f_macrs_cred - fixed_omf)
+        st.write(fixed_cash_flow)
         #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
