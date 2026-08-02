@@ -263,7 +263,7 @@ if uploaded_file is not None:
     om_base_t = 30
     uer = 0.08      #low
     #uef = 1 + (uer * (t - 1))) 
-
+    fixed_cash_flow = []
 
     for i in range(total_yrs):
         yr_num = i + 1
@@ -311,7 +311,7 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
-        fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
+        fixed_cash_flow.append(egenf + f_macrs_cred - fixed_omf)
         #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
