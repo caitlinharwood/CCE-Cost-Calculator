@@ -395,7 +395,7 @@ if uploaded_file is not None:
     
     if use_pv: 
         chart_baseline = baseline_trend_pv
-        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else test 
+        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_cash_flow 
         chart_tracker = tracker_raw_trend_pv if free_cash_flow == "Raw Spending" else tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
@@ -481,7 +481,6 @@ if uploaded_file is not None:
             font = dict(color = "black", size = 11)
         )
         
-
     if break_even_t is not None:
         fig.add_vline(
             x = break_even_t,
