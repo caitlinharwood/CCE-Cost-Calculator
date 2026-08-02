@@ -375,8 +375,8 @@ if uploaded_file is not None:
     def calc_npv_f(rate,values):
         return sum(v / ((1 + rate) ** t) for t,v in enumerate(values,start = 1))
     
-    calc_npv_f(disc_rate,fixed_cash_flow)
-    st.write(calc_npv_f)
+    test = calc_npv_f(disc_rate,fixed_cash_flow)
+    st.write(test)
 
     target_len = len(years)
 
