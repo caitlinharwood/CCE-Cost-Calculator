@@ -126,6 +126,7 @@ if uploaded_file is not None:
     baseline_trend_pv,fixed_trend_pv,tracker_trend_pv = [],[],[]
     fixed_raw_trend,fixed_raw_trend_pv = [],[]
     tracker_raw_trend,tracker_raw_trend_pv = [],[]
+    fixed_cash_flow_trend = []
 
     df['usage_parsed'] = pd.to_numeric(df[target_column], errors='coerce')
     df_clean = df.dropna(subset=['usage_parsed', target_column_date]).copy()
@@ -311,7 +312,9 @@ if uploaded_file is not None:
         fixed_omf = om_base * system_size * fixed_om
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
-        fixed_cash_flow.append(egenf + f_macrs_cred - fixed_omf)
+        fixed_cash_flow = (egenf + f_macrs_cred - fixed_omf)
+        f_flow += fixed_cash_flow
+        fixed_cash_flow_trend.append(f_flow)
         #st.write(fixed_cash_flow)
         #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
@@ -395,7 +398,7 @@ if uploaded_file is not None:
     
     if use_pv: 
         chart_baseline = baseline_trend_pv
-        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_cash_flow 
+        chart_fixed = fixed_raw_trend_pv if free_cash_flow == "Raw Spending" else fixed_cash_flow_trend 
         chart_tracker = tracker_raw_trend_pv if free_cash_flow == "Raw Spending" else tracker_trend_pv
         y_axis_title = "Present Value of Cumulative Spending ($)"
         chart_title = "20-Year Cumulative Spending (Present Value)"
