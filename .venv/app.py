@@ -283,15 +283,6 @@ if uploaded_file is not None:
         else:
             egenf = .141 * total_baseline_kwh * utility_escalation_factor * panel_eff
 
-
-        #if i == 20:
-         #   st.write("kwh",total_baseline_kwh)
-          #  st.write("uef",utility_escalation_factor)
-           # st.write("panel eff",panel_eff)
-            #st.write("egenf",egenf)
-        #eff_utility_rate[0.141]
-
-
         #current baseline
         current_spending = base_yr_spend * utility_escalation_factor
         cash_flow_base += current_spending
@@ -321,7 +312,7 @@ if uploaded_file is not None:
         fixed_out_of_pocket = fixed_remaining + fixed_om - f_macrs_cred + fixed_yearly_opex + current_loan_f
         fixed_upfront_2 = (-1) * total_sys_cost_f * 0.5
         fixed_cash_flow = egenf + f_macrs_cred - fixed_omf
-        fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
+        #fixed_20yr_npv = npf.npv(disc_rate,[fixed_cash_flow[i]])
         fixed_out_of_pocket_raw = fixed_remaining + fixed_om + fixed_yearly_opex + current_loan_f
 
         if not loan and yr_num == 1:
@@ -381,6 +372,11 @@ if uploaded_file is not None:
         fixed_raw_ann_savings.append(current_spending - fixed_out_of_pocket_raw)
         tracker_raw_ann_savings.append(current_spending - tracker_out_of_pocket_raw)
         
+    def calc_npv_f(rate,values):
+        return sum(v / ((1 + rate) ** t) for t,v in enumerate(values,start = 1))
+    
+    calc_npv_f(disc_rate,fixed_cash_flow)
+    st.write(calc_npv_f)
 
     target_len = len(years)
 
