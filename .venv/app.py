@@ -219,7 +219,7 @@ if uploaded_file is not None:
     fixed_yearly_opex = system_size_f * 5.0
     tracker_yearly_opex = system_size_t * 8.0
 
-    f_fixed = []
+    f_flow = 0.0
 
     if loan:
         cf_fixed = 0.0
