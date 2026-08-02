@@ -392,7 +392,10 @@ if uploaded_file is not None:
         tracker_raw_ann_savings.append(current_spending - tracker_out_of_pocket_raw)
 
         if i in (0,5,10,19):
+            st.write(f"year {i+1}:")
             st.write(f"year {i+1}: fixed_remaining={fixed_remaining:.0f},tracker_remaining={tracker_remaining:.0f}")
+            st.write(f"fixed_omf={fixed_omf:.0f} tracker_omf={tracker_omf:.0f}")
+            st.write(f"fixed_tearly_opex={fixed_yearly_opex:.0f} tracker_yearly_opex={tracker_yearly_opex:.0f}")
 
     yr0_outlay = -1 * total_sys_cost_f * 0.5  
     def calc_npv_f(rate,annual_flows,initial_cost=0.0):
