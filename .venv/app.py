@@ -198,7 +198,8 @@ if uploaded_file is not None:
     #tracker calculations
     #tracker_yearly = target_cap_kw * (1350 * 1.25)
     kw_dc = 435 * complexity
-    target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker) if total_baseline_kwh else 0
+    target_sys_t = system_size_t
+    #target_sys_t = total_baseline_kwh * 1000 / (kw_dc * kwh_kw_yr_tracker) if total_baseline_kwh else 0
     num_modules_t = (total_baseline_kwh / (0.435 * 2360)) if total_baseline_kwh else 0
     num_trackers_rec = math.ceil(num_modules_t / mod_per_tracker)
     st.sidebar.write(f"Recommended: {num_trackers_rec} trackers")
