@@ -261,10 +261,10 @@ if uploaded_file is not None:
 
 
     #from excel sheet
-    total_sys_cost_f = system_size * 1000 * ppw
+    total_sys_cost_f = system_size_f * 1000 * ppw
     dep_basis_f = total_sys_cost_f * 0.75
     om_base_f = 12.5
-    total_sys_cost_t = ppw * system_size * 1000
+    total_sys_cost_t = ppw * system_size_t * 1000
     dep_basis_t = total_sys_cost_t * 0.75
     om_base_t = 30
     uer = 0.08      #low
