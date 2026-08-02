@@ -358,11 +358,14 @@ if uploaded_file is not None:
         
         tracker_offset = tracker_gen_usable * eff_rate_blend * utility_escalation_factor
         tracker_remaining = max(0.0,current_spending - tracker_offset)
-        tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
+        #tracker_om = (system_size_t * om_per_kw * 1.25) * om_escalation_factor 
+        tracker_om = 1 + (.03 * (i - 1))
+        om_base_t = 30 #$/kWh-yr
+        tracker_omf = om_base_t * system_size_t * tracker_om
         
         #net tracker
-        tracker_out_of_pocket = tracker_remaining + tracker_om - t_macrs_cred + tracker_yearly_opex + current_loan_t
-        tracker_out_of_pocket_raw = tracker_remaining + tracker_om + tracker_yearly_opex + current_loan_t
+        tracker_out_of_pocket = tracker_remaining + tracker_omf - t_macrs_cred + tracker_yearly_opex + current_loan_t
+        tracker_out_of_pocket_raw = tracker_remaining + tracker_omf + tracker_yearly_opex + current_loan_t
         
         if not loan and yr_num == 1:
             tracker_out_of_pocket += tracker_upfront
